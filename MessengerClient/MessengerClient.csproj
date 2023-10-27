@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Views\" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0-rc.2.23479.6" />
     </ItemGroup>
 
 </Project>

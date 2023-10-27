@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using MessengerClient.Commands;
+using MessengerClient.Views;
 
 namespace MessengerClient.ViewModels;
 
@@ -11,8 +12,11 @@ public class AuthorizationViewModel : INotifyPropertyChanged
     private string _nickname = "Nick";
     private string _password;
     private RelayCommand _signInCommand;
-    
+
+    public LoginWindow Window { get; private set; }
+
     public event PropertyChangedEventHandler PropertyChanged;
+    public event Action OnSignedIn;
     
     public string Nickname
     {
@@ -42,10 +46,17 @@ public class AuthorizationViewModel : INotifyPropertyChanged
             return _signInCommand ??= new RelayCommand(obj =>
             {
                 Console.WriteLine("Sign in");
+                OnSignedIn?.Invoke();
             });
         }
     }
 
+    public AuthorizationViewModel()
+    {
+        Window = new LoginWindow();
+        Window.DataContext = this;
+    }
+    
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
