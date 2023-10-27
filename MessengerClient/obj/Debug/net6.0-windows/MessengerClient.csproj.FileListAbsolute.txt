@@ -17,8 +17,6 @@ D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\refin
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\MessengerClient.pdb
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\MessengerClient.genruntimeconfig.cache
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\ref\MessengerClient.dll
-D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\LoginWindow.g.cs
-D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\LoginWindow.baml
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\ChatWindow.g.cs
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\ChatWindow.baml
 D:\Documents\Work\MessengerClient\MessengerClient\bin\Debug\net6.0-windows\Microsoft.Extensions.Configuration.dll
@@ -56,3 +54,5 @@ D:\Documents\Work\MessengerClient\MessengerClient\bin\Debug\net6.0-windows\runti
 D:\Documents\Work\MessengerClient\MessengerClient\bin\Debug\net6.0-windows\runtimes\win\lib\net6.0\System.Diagnostics.EventLog.dll
 D:\Documents\Work\MessengerClient\MessengerClient\bin\Debug\net6.0-windows\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\MessengerClient.csproj.CopyComplete
+D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\LoginWindow.g.cs
+D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\LoginWindow.baml
