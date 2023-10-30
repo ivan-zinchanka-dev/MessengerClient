@@ -12,8 +12,8 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.75*"/>
-            <RowDefinition Height="0.02*"/>
-            <RowDefinition Height="0.23*"/>
+            <RowDefinition Height="0.20*"/>
+            <RowDefinition Height="0.05*"/>
         </Grid.RowDefinitions>
         
         <ListView Grid.Row="0" x:Name="_messagesListView" ScrollViewer.CanContentScroll="False">
@@ -27,8 +27,11 @@
             </ListView.ItemTemplate>
         </ListView>
         
-        <GridSplitter Grid.Row="1"/>
-        <TextBox Grid.Row="2" />
+        <TextBox Grid.Row="1" Margin="10 10 10 10" />
+        
+        <StackPanel Grid.Row="2" Margin="0 1 10 1">
+            <Button VerticalAlignment="Center" HorizontalAlignment="Right" Width="100" Content="Send"/>
+            </StackPanel>
         
     </Grid>
 </Window>
