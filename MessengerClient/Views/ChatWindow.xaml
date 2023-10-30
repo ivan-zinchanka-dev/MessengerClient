@@ -11,10 +11,56 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.75*"/>
-            <RowDefinition Height="0.25*"/>
+            <RowDefinition Height="0.02*"/>
+            <RowDefinition Height="0.23*"/>
         </Grid.RowDefinitions>
-        <ListBox Grid.Row="0" />
-        <TextBox Grid.Row="1" />
+        <ListBox Grid.Row="0" SelectionMode="Multiple" ScrollViewer.CanContentScroll="False">
+            <ListBoxItem HorizontalAlignment="Center">
+                <!--<StackPanel>
+                    ~1~<Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>@1@
+                        
+                    <TextBlock Text="Ivan"/>
+                    <TextBlock HorizontalAlignment="Left" Width="300" Text="The lunar surface is covered in lunar dust and marked by mountains, impact craters, their ejecta, ray-like streaks and, mostly on the near side of the Moon, by dark maria, which are plains of cooled magma. These maria formed when large impacts on the far side of the Moon heated up low lying layers of its crust on the near side. The Moon is, beside when passing through Earth's shadow during a lunar eclipse, always illuminated by the Sun, but from Earth the visible illumination shifts during its orbit, producing the lunar phases.[19] The Moon is the brightest celestial object in Earth's night sky. This is mainly due to its large angular diameter, while the reflectance of the lunar surface is comparable to that of asphalt. The apparent size is nearly the same as that of the Sun, allowing it to cover the Sun almost completely during a total solar eclipse. From Earth about 59% of the lunar surface is visible over time due to cyclical shifts in perspective (libration), making parts of the far side of the Moon visible."/>
+                </StackPanel>-->
+                
+                <StackPanel Width="410">
+                    <TextBlock Text="User one" FontWeight="Bold"/>
+                    <TextBlock TextWrapping="Wrap" TextAlignment="Justify" Text="The lunar surface is covered in lunar dust and marked by mountains, impact craters, their ejecta, ray-like streaks and, mostly on the near side of the Moon, by dark maria, which are plains of cooled magma. These maria formed when large impacts on the far side of the Moon heated up low lying layers of its crust on the near side. The Moon is, beside when passing through Earth's shadow during a lunar eclipse, always illuminated by the Sun, but from Earth the visible illumination shifts during its orbit, producing the lunar phases.[19] The Moon is the brightest celestial object in Earth's night sky. This is mainly due to its large angular diameter, while the reflectance of the lunar surface is comparable to that of asphalt. The apparent size is nearly the same as that of the Sun, allowing it to cover the Sun almost completely during a total solar eclipse. From Earth about 59% of the lunar surface is visible over time due to cyclical shifts in perspective (libration), making parts of the far side of the Moon visible."/>
+                </StackPanel>
+                
+                
+                
+                <!--<StackPanel Width="500">
+                    <TextBlock 
+                        Text="The lunar surface is covered in lunar dust and marked by mountains, impact craters, their ejecta, ray-like streaks and, mostly on the near side of the Moon, by dark maria, which are plains of cooled magma. These maria formed when large impacts on the far side of the Moon heated up low lying layers of its crust on the near side. The Moon is, beside when passing through Earth's shadow during a lunar eclipse, always illuminated by the Sun, but from Earth the visible illumination shifts during its orbit, producing the lunar phases.[19] The Moon is the brightest celestial object in Earth's night sky. This is mainly due to its large angular diameter, while the reflectance of the lunar surface is comparable to that of asphalt. The apparent size is nearly the same as that of the Sun, allowing it to cover the Sun almost completely during a total solar eclipse. From Earth about 59% of the lunar surface is visible over time due to cyclical shifts in perspective (libration), making parts of the far side of the Moon visible."
+                        TextWrapping="Wrap"
+                        TextAlignment="Justify"/>
+                </StackPanel>-->
+                
+            </ListBoxItem>
+            
+            <ListBoxItem>
+                <StackPanel Width="410">
+                    <TextBlock TextAlignment="Right" Text="User two" FontWeight="Bold"/>
+                    <TextBlock TextWrapping="Wrap" TextAlignment="Justify" Text="The lunar surface is covered in lunar dust and marked by mountains, impact craters, their ejecta, ray-like streaks and, mostly on the near side of the Moon, by dark maria, which are plains of cooled magma. These maria formed when large impacts on the far side of the Moon heated up low lying layers of its crust on the near side. The Moon is, beside when passing through Earth's shadow during a lunar eclipse, always illuminated by the Sun, but from Earth the visible illumination shifts during its orbit, producing the lunar phases.[19] The Moon is the brightest celestial object in Earth's night sky. This is mainly due to its large angular diameter, while the reflectance of the lunar surface is comparable to that of asphalt. The apparent size is nearly the same as that of the Sun, allowing it to cover the Sun almost completely during a total solar eclipse. From Earth about 59% of the lunar surface is visible over time due to cyclical shifts in perspective (libration), making parts of the far side of the Moon visible."/>
+                </StackPanel> 
+                
+            </ListBoxItem>
+            
+            <ListBoxItem>
+                <StackPanel Width="410">
+                    <TextBlock TextAlignment="Right" Text="User two" FontWeight="Bold"/>
+                    <TextBlock TextWrapping="Wrap" TextAlignment="Justify" Text="The lunar surface is covered in lunar dust and marked by mountains, impact craters, their ejecta, ray-like streaks and, mostly on the near side of the Moon, by dark maria, which are plains of cooled magma. These maria formed when large impacts on the far side of the Moon heated up low lying layers of its crust on the near side. The Moon is, beside when passing through Earth's shadow during a lunar eclipse, always illuminated by the Sun, but from Earth the visible illumination shifts during its orbit, producing the lunar phases.[19] The Moon is the brightest celestial object in Earth's night sky. This is mainly due to its large angular diameter, while the reflectance of the lunar surface is comparable to that of asphalt. The apparent size is nearly the same as that of the Sun, allowing it to cover the Sun almost completely during a total solar eclipse. From Earth about 59% of the lunar surface is visible over time due to cyclical shifts in perspective (libration), making parts of the far side of the Moon visible."/>
+                </StackPanel> 
+                
+            </ListBoxItem>
+            
+            
+        </ListBox>
+        <GridSplitter Grid.Row="1"/>
+        <TextBox Grid.Row="2" />
         
     </Grid>
 </Window>
