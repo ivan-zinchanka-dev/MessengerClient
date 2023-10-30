@@ -16,7 +16,7 @@
             <RowDefinition Height="0.05*"/>
         </Grid.RowDefinitions>
         
-        <ListView Grid.Row="0" x:Name="_messagesListView" ScrollViewer.CanContentScroll="False">
+        <ListView Grid.Row="0" x:FieldModifier="private" x:Name="_messagesListView" ScrollViewer.CanContentScroll="False">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Width="410">
@@ -27,10 +27,12 @@
             </ListView.ItemTemplate>
         </ListView>
         
-        <TextBox Grid.Row="1" Margin="10 10 10 10" />
+        <TextBox Grid.Row="1" Margin="10 10 10 10" 
+                 Text="{Binding MessageInputText}" />
         
         <StackPanel Grid.Row="2" Margin="0 1 10 1">
-            <Button VerticalAlignment="Center" HorizontalAlignment="Right" Width="100" Content="Send"/>
+            <Button VerticalAlignment="Center" HorizontalAlignment="Right" Width="100" 
+                    Content="Send" Command="{Binding SendMessageCommand}"/>
             </StackPanel>
         
     </Grid>
