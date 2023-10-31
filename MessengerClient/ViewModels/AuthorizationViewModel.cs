@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using MessengerClient.Commands;
 using MessengerClient.Core.Models;
 using MessengerClient.Views;
@@ -63,13 +64,14 @@ public class AuthorizationViewModel : INotifyPropertyChanged
                     Nickname = Nickname,
                     Password = Password
                 };
-
-                OnSignedIn?.Invoke();
                 
-                /*_appClient.TryLoginAsync(user).ContinueWith(task =>
+                _appClient.TryLoginAsync(user, success =>
                 {
-                    if (task.Result)
+                    Console.WriteLine("Res: " + success.ToString());
+                    
+                    if (success)
                     {
+                        Console.WriteLine("Try event");
                         OnSignedIn?.Invoke();
                     }
                     else
@@ -77,7 +79,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged
                         ErrorMessage = "User not exist";
                     }
 
-                });*/
+                });
                 
             });
         }

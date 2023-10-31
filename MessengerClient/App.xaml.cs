@@ -55,7 +55,7 @@ namespace MessengerClient
                 _chatViewModel.Window.OnHidden += Shutdown;
             };
 
-            //_appClient.TryStartAsync();
+            _appClient.TryStartAsync();
             
             
             base.OnStartup(e);

@@ -30,7 +30,7 @@ public class AppClient : IDisposable
         }
     }
 
-    public async Task<bool> TryLoginAsync(User user)
+    public async void TryLoginAsync(User user, Action<bool> onCompleteCallback)
     {
         NetworkStream networkStream = _tcpClient.GetStream();
         StreamReader reader = new StreamReader(networkStream);
@@ -46,7 +46,7 @@ public class AppClient : IDisposable
         Response response = Response.FromRawLine(rawLine);
 
         bool success = JsonSerializer.Deserialize<bool>(response.JsonDataString);
-        return success;
+        onCompleteCallback?.Invoke(success);
     }
 
 
