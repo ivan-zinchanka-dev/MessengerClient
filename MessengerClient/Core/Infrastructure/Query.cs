@@ -21,9 +21,8 @@ public class Query
     
     private static string ToByteNotation(QueryHeader header)
     {
-        const int byteStringLength = 3;
         string result = ((byte)header).ToString();
-        int emptyCharsCount = byteStringLength - result.Length;
+        int emptyCharsCount = HeaderLength - result.Length;
 
         if (emptyCharsCount > 0)
         {
@@ -33,7 +32,7 @@ public class Query
         return result;
     }
     
-    public Query(QueryHeader header, string jsonDataString)
+    public Query(QueryHeader header, string jsonDataString = "")
     {
         Header = header;
         JsonDataString = jsonDataString;

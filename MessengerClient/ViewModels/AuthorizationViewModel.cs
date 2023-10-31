@@ -11,8 +11,8 @@ namespace MessengerClient.ViewModels;
 
 public class AuthorizationViewModel : INotifyPropertyChanged
 {
-    private string _nickname = "Nick";
-    private string _password;
+    private string _nickname = "Jan Zinch";
+    private string _password = "111111";
     private string _errorMessage;
     private RelayCommand _signInCommand;
 
@@ -67,18 +67,14 @@ public class AuthorizationViewModel : INotifyPropertyChanged
                 
                 _appClient.TryLoginAsync(user, success =>
                 {
-                    Console.WriteLine("Res: " + success.ToString());
-                    
                     if (success)
                     {
-                        Console.WriteLine("Try event");
                         OnSignedIn?.Invoke();
                     }
                     else
                     {
                         ErrorMessage = "User not exist";
                     }
-
                 });
                 
             });

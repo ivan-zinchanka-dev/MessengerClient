@@ -15,6 +15,8 @@ public class ChatViewModel : INotifyPropertyChanged
     private string _messageInputText = "Input yours";
     private RelayCommand _sendMessageCommand;
     
+    private AppClient _appClient;
+    
     public ChatWindow Window { get; private set; }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -44,42 +46,22 @@ public class ChatViewModel : INotifyPropertyChanged
             });
         }
     }
-
-    private void InitMessagesList()
+    
+    public ChatViewModel(AppClient appClient)
     {
-        _messages.Add(new Message()
-        {
-            Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-        });
+        _appClient = appClient;
 
-        _messages.Add(new Message()
-        {
-            Text = "Who?"
-        });
-        
-        _messages.Add(new Message()
-        {
-            Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-        });
-        
-        _messages.Add(new Message()
-        {
-            Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-        });
-        
-        _messages.Add(new Message()
-        {
-            Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-        });
-    }
-
-    public ChatViewModel()
-    {
-        InitMessagesList();
-        
         Window = new ChatWindow();
         Window.DataContext = this;
         Window.MessagesListViewSource = _messages;
+    }
+    
+    public void InitMessagesList()
+    {
+        _appClient.GetMessagesAsync(messagesList =>
+        {
+            _messages = new ObservableCollection<Message>(messagesList);
+        });
     }
     
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

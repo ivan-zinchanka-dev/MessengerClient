@@ -40,7 +40,7 @@ namespace MessengerClient
             _appClient = new AppClient();
             
             _authorizationViewModel = new AuthorizationViewModel(_appClient);
-            _chatViewModel = new ChatViewModel();
+            _chatViewModel = new ChatViewModel(_appClient);
             
             
             _authorizationViewModel.Window.Show();
@@ -51,6 +51,7 @@ namespace MessengerClient
                 _authorizationViewModel.Window.OnHidden -= Shutdown;
                 _authorizationViewModel.Window.Close();
                 
+                _chatViewModel.InitMessagesList();
                 _chatViewModel.Window.Show();
                 _chatViewModel.Window.OnHidden += Shutdown;
             };
@@ -67,7 +68,10 @@ namespace MessengerClient
             /*_host.StopAsync();
             _host.Dispose();*/
 
-            _appClient.Dispose();
+            _appClient.QuitAsync(() =>
+            {
+                _appClient.Dispose();
+            });
             
             base.OnExit(e);
         }

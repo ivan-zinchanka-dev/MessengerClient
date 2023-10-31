@@ -49,6 +49,39 @@ public class AppClient : IDisposable
         onCompleteCallback?.Invoke(success);
     }
 
+    public async void GetMessagesAsync(Action<List<Message>> onCompleteCallback)
+    {
+        NetworkStream networkStream = _tcpClient.GetStream();
+        StreamReader reader = new StreamReader(networkStream);
+        StreamWriter writer = new StreamWriter(networkStream);
+        
+        Query query = new Query(QueryHeader.UpdateChat);
+        
+        await writer.WriteAsync(query.ToString());
+        await writer.FlushAsync();
+        
+        string rawLine = await reader.ReadLineAsync();
+        Response response = Response.FromRawLine(rawLine);
+
+        List<Message> messagesList = JsonSerializer.Deserialize<List<Message>>(response.JsonDataString);
+        onCompleteCallback?.Invoke(messagesList);
+    }
+    
+    
+    public async void QuitAsync(Action onCompleteCallback)
+    {
+        NetworkStream networkStream = _tcpClient.GetStream();
+        StreamReader reader = new StreamReader(networkStream);
+        StreamWriter writer = new StreamWriter(networkStream);
+
+        Query query = new Query(QueryHeader.Quit);
+        
+        await writer.WriteAsync(query.ToString());
+        await writer.FlushAsync();
+        
+        onCompleteCallback?.Invoke();
+    }
+
 
     /*public async Task Run()
     {

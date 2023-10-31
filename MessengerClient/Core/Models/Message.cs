@@ -4,8 +4,8 @@ namespace MessengerClient.Core.Models;
 
 public class Message
 {
-    public User Sender { get; init; }
-    public User Receiver { get; init; }
+    public string SenderNickname { get; init; }
+    public string ReceiverNickname { get; init; }
     public string Text { get; init; }
     public DateTime PostDateTime { get; init; }
 
