@@ -56,3 +56,4 @@ D:\Documents\Work\MessengerClient\MessengerClient\bin\Debug\net6.0-windows\runti
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\MessengerClient.csproj.CopyComplete
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\LoginWindow.g.cs
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\LoginWindow.baml
+D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\App.baml

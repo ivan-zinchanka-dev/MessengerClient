@@ -14,17 +14,20 @@
             
             <TextBox Margin="0 0 0 0"
                      FontSize="14"
-                     Text="{Binding Nickname}"
+                     Text="{Binding Nickname, UpdateSourceTrigger=PropertyChanged}"
                      />
             
-            <PasswordBox Margin="0 10 0 0"
-                         FontSize="14"
-                         Password="456"
+            <TextBox Margin="0 10 0 0"
+                     FontSize="14"
+                     Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
             />
+            
+            <!--Password="{Binding Password}"-->
             
             <TextBlock Margin="0 60 0 0"
                        FontSize="14"
-                       Text="Nickname not found" TextAlignment="Center" 
+                       Text="{Binding ErrorMessage, UpdateSourceTrigger=PropertyChanged}" 
+                       TextAlignment="Center" 
                        Foreground="Crimson"/>
             
             <Button Margin="0 60 0 0" Width="100"

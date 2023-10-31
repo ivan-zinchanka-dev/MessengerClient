@@ -18,6 +18,8 @@ namespace MessengerClient
 
         //private readonly IHost _host;
 
+        private AppClient _appClient;
+        
         private AuthorizationViewModel _authorizationViewModel;
         private ChatViewModel _chatViewModel;
         
@@ -35,35 +37,38 @@ namespace MessengerClient
         
         protected override void OnStartup(StartupEventArgs e)
         {
-            /*_host.Start();
-
-            MainWindow = _host.Services.GetRequiredService<LoginWindow>();
-            MainWindow.Show();*/
-
-
-            _authorizationViewModel = new AuthorizationViewModel();
+            _appClient = new AppClient();
+            
+            _authorizationViewModel = new AuthorizationViewModel(_appClient);
             _chatViewModel = new ChatViewModel();
             
             
             _authorizationViewModel.Window.Show();
+            _authorizationViewModel.Window.OnHidden += Shutdown;
             
             _authorizationViewModel.OnSignedIn += () =>
             {
+                _authorizationViewModel.Window.OnHidden -= Shutdown;
                 _authorizationViewModel.Window.Close();
+                
                 _chatViewModel.Window.Show();
+                _chatViewModel.Window.OnHidden += Shutdown;
             };
 
-            //MainWindow = new LoginWindow();
-            //MainWindow.Show();
+            //_appClient.TryStartAsync();
+            
             
             base.OnStartup(e);
         }
+        
 
         protected override void OnExit(ExitEventArgs e)
         {
             /*_host.StopAsync();
             _host.Dispose();*/
 
+            _appClient.Dispose();
+            
             base.OnExit(e);
         }
 

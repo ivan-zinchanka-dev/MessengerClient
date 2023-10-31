@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using MessengerClient.Commands;
+using MessengerClient.Core.Models;
 using MessengerClient.Views;
 
 namespace MessengerClient.ViewModels;
@@ -11,8 +12,11 @@ public class AuthorizationViewModel : INotifyPropertyChanged
 {
     private string _nickname = "Nick";
     private string _password;
+    private string _errorMessage;
     private RelayCommand _signInCommand;
 
+    private AppClient _appClient;
+    
     public LoginWindow Window { get; private set; }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -24,7 +28,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         set
         {
             _nickname = value;
-            OnPropertyChanged(nameof(Nickname));
+            OnPropertyChanged();
         }
     }
 
@@ -34,10 +38,19 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         set
         {
             _password = value;
-            OnPropertyChanged(nameof(Password));
+            OnPropertyChanged();
         }
     }
     
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        set
+        {
+            _errorMessage = value;
+            OnPropertyChanged();
+        }
+    }
     
     public RelayCommand SignInCommand
     {
@@ -45,18 +58,45 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         {
             return _signInCommand ??= new RelayCommand(obj =>
             {
-                Console.WriteLine("Sign in");
+                User user = new User()
+                {
+                    Nickname = Nickname,
+                    Password = Password
+                };
+
                 OnSignedIn?.Invoke();
+                
+                /*_appClient.TryLoginAsync(user).ContinueWith(task =>
+                {
+                    if (task.Result)
+                    {
+                        OnSignedIn?.Invoke();
+                    }
+                    else
+                    {
+                        ErrorMessage = "User not exist";
+                    }
+
+                });*/
+                
             });
         }
     }
 
-    public AuthorizationViewModel()
+    public AuthorizationViewModel(AppClient appClient)
     {
+        _appClient = appClient;
+        _appClient.ErrorCaptured += OnAppClientErrorCaptured;
+        
         Window = new LoginWindow();
         Window.DataContext = this;
     }
-    
+
+    private void OnAppClientErrorCaptured()
+    {
+        ErrorMessage = "Connection error";
+    }
+
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
