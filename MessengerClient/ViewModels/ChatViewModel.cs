@@ -61,6 +61,8 @@ public class ChatViewModel : INotifyPropertyChanged
         _appClient.GetMessagesAsync(messagesList =>
         {
             _messages = new ObservableCollection<Message>(messagesList);
+            Window.MessagesListViewSource = _messages;
+            Console.WriteLine("Initialized");
         });
     }
     

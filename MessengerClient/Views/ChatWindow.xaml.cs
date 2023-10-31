@@ -15,7 +15,12 @@ public partial class ChatWindow : Window
         get => _messagesListView.ItemsSource;
         set => _messagesListView.ItemsSource = value;
     }
-    
+
+    public void Refresh()
+    {
+        _messagesListView.Items.Refresh();
+    }
+
     public ChatWindow()
     {
         InitializeComponent();
