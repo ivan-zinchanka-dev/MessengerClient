@@ -37,10 +37,19 @@ public class ChatViewModel : INotifyPropertyChanged
         {
             return _sendMessageCommand ??= new RelayCommand(obj =>
             {
-                Console.WriteLine("Send");
-                _messages.Add(new Message()
+                Message message = new Message()
                 {
-                    Text = _messageInputText
+                    SenderNickname = App.Instance.CurrentUser.Nickname,
+                    ReceiverNickname = string.Empty,
+                    Text = _messageInputText,
+                    PostDateTime = DateTime.UtcNow
+                };
+                
+                _messages.Add(message);
+                
+                _appClient.PostMessagesAsync(message, success =>
+                {
+                    Console.WriteLine(success? "posted" : "not_posted");
                 });
                 
             });

@@ -32,52 +32,47 @@ public class AppClient : IDisposable
 
     public async void TryLoginAsync(User user, Action<bool> onCompleteCallback)
     {
-        NetworkStream networkStream = _tcpClient.GetStream();
-        StreamReader reader = new StreamReader(networkStream);
-        StreamWriter writer = new StreamWriter(networkStream);
-
+        NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
+        
         string jsonMessageBuffer = JsonSerializer.Serialize(user);
         Query query = new Query(QueryHeader.Login, jsonMessageBuffer);
+        await networkAdaptor.SendQueryAsync(query);
         
-        await writer.WriteAsync(query.ToString());
-        await writer.FlushAsync();
-        
-        string rawLine = await reader.ReadLineAsync();
-        Response response = Response.FromRawLine(rawLine);
-
+        Response response = await networkAdaptor.ReceiveResponseAsync();
         bool success = JsonSerializer.Deserialize<bool>(response.JsonDataString);
         onCompleteCallback?.Invoke(success);
     }
 
     public async void GetMessagesAsync(Action<List<Message>> onCompleteCallback)
     {
-        NetworkStream networkStream = _tcpClient.GetStream();
-        StreamReader reader = new StreamReader(networkStream);
-        StreamWriter writer = new StreamWriter(networkStream);
+        NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
         
         Query query = new Query(QueryHeader.UpdateChat);
+        await networkAdaptor.SendQueryAsync(query);
         
-        await writer.WriteAsync(query.ToString());
-        await writer.FlushAsync();
-        
-        string rawLine = await reader.ReadLineAsync();
-        Response response = Response.FromRawLine(rawLine);
-
+        Response response = await networkAdaptor.ReceiveResponseAsync();
         List<Message> messagesList = JsonSerializer.Deserialize<List<Message>>(response.JsonDataString);
         onCompleteCallback?.Invoke(messagesList);
     }
     
+    public async void PostMessagesAsync(Message message, Action<bool> onCompleteCallback)
+    {
+        NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
+        
+        Query query = new Query(QueryHeader.PostMessage, JsonSerializer.Serialize(message));
+        await networkAdaptor.SendQueryAsync(query);
+        
+        Response response = await networkAdaptor.ReceiveResponseAsync();
+        bool success = JsonSerializer.Deserialize<bool>(response.JsonDataString);
+        onCompleteCallback?.Invoke(success);
+    }
     
     public async void QuitAsync(Action onCompleteCallback)
     {
-        NetworkStream networkStream = _tcpClient.GetStream();
-        StreamReader reader = new StreamReader(networkStream);
-        StreamWriter writer = new StreamWriter(networkStream);
+        NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
 
         Query query = new Query(QueryHeader.Quit);
-        
-        await writer.WriteAsync(query.ToString());
-        await writer.FlushAsync();
+        await networkAdaptor.SendQueryAsync(query);
         
         onCompleteCallback?.Invoke();
     }

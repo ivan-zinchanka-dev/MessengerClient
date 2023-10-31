@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using MessengerClient.Core.Models;
 using MessengerClient.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,7 +23,9 @@ namespace MessengerClient
         
         private AuthorizationViewModel _authorizationViewModel;
         private ChatViewModel _chatViewModel;
-        
+
+        public User CurrentUser { get; private set; }
+
         public App()
         {
             Instance = this;
@@ -38,16 +41,16 @@ namespace MessengerClient
         protected override void OnStartup(StartupEventArgs e)
         {
             _appClient = new AppClient();
-            
             _authorizationViewModel = new AuthorizationViewModel(_appClient);
             _chatViewModel = new ChatViewModel(_appClient);
-            
             
             _authorizationViewModel.Window.Show();
             _authorizationViewModel.Window.OnHidden += Shutdown;
             
-            _authorizationViewModel.OnSignedIn += () =>
+            _authorizationViewModel.OnSignedIn += user =>
             {
+                CurrentUser = user;
+                
                 _authorizationViewModel.Window.OnHidden -= Shutdown;
                 _authorizationViewModel.Window.Close();
                 

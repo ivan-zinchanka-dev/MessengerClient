@@ -21,7 +21,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged
     public LoginWindow Window { get; private set; }
 
     public event PropertyChangedEventHandler PropertyChanged;
-    public event Action OnSignedIn;
+    public event Action<User> OnSignedIn;
     
     public string Nickname
     {
@@ -69,7 +69,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged
                 {
                     if (success)
                     {
-                        OnSignedIn?.Invoke();
+                        OnSignedIn?.Invoke(user);
                     }
                     else
                     {
