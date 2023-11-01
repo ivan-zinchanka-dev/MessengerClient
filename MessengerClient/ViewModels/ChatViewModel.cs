@@ -16,6 +16,7 @@ public class ChatViewModel : INotifyPropertyChanged
     private RelayCommand _sendMessageCommand;
     
     private AppClient _appClient;
+    private ChatUpdater _chatUpdater;
     
     public ChatWindow Window { get; private set; }
 
@@ -59,22 +60,28 @@ public class ChatViewModel : INotifyPropertyChanged
     public ChatViewModel(AppClient appClient)
     {
         _appClient = appClient;
+        _chatUpdater = new ChatUpdater(appClient, UpdateMessagesList);
 
         Window = new ChatWindow();
         Window.DataContext = this;
         Window.MessagesListViewSource = _messages;
     }
     
-    public void InitMessagesList()
+    public void Initialize()
     {
-        _appClient.GetMessagesAsync(messagesList =>
+        _chatUpdater.Start(true);
+    }
+
+    private void UpdateMessagesList(List<Message> actualMessages)
+    {
+        Window.Dispatcher.Invoke(() =>
         {
-            _messages = new ObservableCollection<Message>(messagesList);
+            _messages = new ObservableCollection<Message>(actualMessages);
             Window.MessagesListViewSource = _messages;
-            Console.WriteLine("Initialized");
+            Console.WriteLine("Updated");
         });
     }
-    
+
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

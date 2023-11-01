@@ -20,7 +20,7 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Width="410">
-                        <TextBlock TextAlignment="Left" Text="User one" FontWeight="Bold"/>
+                        <TextBlock TextAlignment="Left" Text="{Binding SenderNickname}" FontWeight="Bold"/>
                         <TextBlock TextWrapping="Wrap" TextAlignment="Justify" Text="{Binding Text}"/>
                     </StackPanel>
                 </DataTemplate>

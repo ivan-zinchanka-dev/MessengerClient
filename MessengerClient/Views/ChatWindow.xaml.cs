@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Threading;
 using MessengerClient.Core.Models;
 
 namespace MessengerClient.Views;
@@ -15,7 +16,7 @@ public partial class ChatWindow : Window
         get => _messagesListView.ItemsSource;
         set => _messagesListView.ItemsSource = value;
     }
-
+    
     public void Refresh()
     {
         _messagesListView.Items.Refresh();

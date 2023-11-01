@@ -54,7 +54,8 @@ namespace MessengerClient
                 _authorizationViewModel.Window.OnHidden -= Shutdown;
                 _authorizationViewModel.Window.Close();
                 
-                _chatViewModel.InitMessagesList();
+                _chatViewModel.Initialize();
+                
                 _chatViewModel.Window.Show();
                 _chatViewModel.Window.OnHidden += Shutdown;
             };
