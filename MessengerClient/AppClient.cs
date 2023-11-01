@@ -60,6 +60,7 @@ public class AppClient : IDisposable
         NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
         
         Query query = new Query(QueryHeader.PostMessage, JsonSerializer.Serialize(message));
+
         await networkAdaptor.SendQueryAsync(query);
         
         Response response = await networkAdaptor.ReceiveResponseAsync();

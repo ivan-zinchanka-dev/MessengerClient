@@ -40,7 +40,7 @@ public class ChatViewModel : INotifyPropertyChanged
                 Message message = new Message()
                 {
                     SenderNickname = App.Instance.CurrentUser.Nickname,
-                    ReceiverNickname = string.Empty,
+                    ReceiverNickname = null,
                     Text = _messageInputText,
                     PostDateTime = DateTime.UtcNow
                 };
