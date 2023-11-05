@@ -54,7 +54,9 @@ D:\Documents\Work\MessengerClient\MessengerClient\bin\Debug\net6.0-windows\runti
 D:\Documents\Work\MessengerClient\MessengerClient\bin\Debug\net6.0-windows\runtimes\win\lib\net6.0\System.Diagnostics.EventLog.dll
 D:\Documents\Work\MessengerClient\MessengerClient\bin\Debug\net6.0-windows\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\MessengerClient.csproj.CopyComplete
-D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\LoginWindow.g.cs
-D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\LoginWindow.baml
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\App.baml
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\GeneratedInternalTypeHelper.g.cs
+D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\SignInWindow.g.cs
+D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\SignUpWindow.g.cs
+D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\SignInWindow.baml
+D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\SignUpWindow.baml

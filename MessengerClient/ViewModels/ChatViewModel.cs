@@ -17,8 +17,8 @@ public class ChatViewModel : INotifyPropertyChanged
     
     private AppClient _appClient;
     private ChatUpdater _chatUpdater;
-    
-    public ChatWindow Window { get; private set; }
+
+    private ChatWindow _window;
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -62,26 +62,33 @@ public class ChatViewModel : INotifyPropertyChanged
         _appClient = appClient;
         _chatUpdater = new ChatUpdater(appClient, UpdateMessagesList);
 
-        Window = new ChatWindow();
-        Window.DataContext = this;
-        Window.MessagesListViewSource = _messages;
+        _window = new ChatWindow();
+        _window.DataContext = this;
+        _window.MessagesListViewSource = _messages;
     }
-    
-    public void Initialize()
+
+    public void ShowWindow()
     {
+        _window.Show();
+        _window.Closed += OnWindowClosedByUser;
         _chatUpdater.Start(true);
     }
 
     private void UpdateMessagesList(List<Message> actualMessages)
     {
-        Window.Dispatcher.Invoke(() =>
+        _window.Dispatcher.Invoke(() =>
         {
             _messages = new ObservableCollection<Message>(actualMessages);
-            Window.MessagesListViewSource = _messages;
+            _window.MessagesListViewSource = _messages;
             Console.WriteLine("Updated");
         });
     }
 
+    private static void OnWindowClosedByUser(object sender, EventArgs e)
+    {
+        App.Instance.Shutdown();
+    }
+    
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Linq;
@@ -20,6 +21,8 @@ namespace MessengerClient
         //private readonly IHost _host;
 
         private AppClient _appClient;
+
+        private INotifyPropertyChanged _currentViewModel;
         
         private AuthorizationViewModel _authorizationViewModel;
         private ChatViewModel _chatViewModel;
@@ -43,30 +46,23 @@ namespace MessengerClient
             _appClient = new AppClient();
             _authorizationViewModel = new AuthorizationViewModel(_appClient);
             _chatViewModel = new ChatViewModel(_appClient);
-            
-            _authorizationViewModel.Window.Show();
-            _authorizationViewModel.Window.OnHidden += Shutdown;
-            
-            _authorizationViewModel.OnSignedIn += user =>
-            {
-                CurrentUser = user;
-                
-                _authorizationViewModel.Window.OnHidden -= Shutdown;
-                _authorizationViewModel.Window.Close();
-                
-                _chatViewModel.Initialize();
-                
-                _chatViewModel.Window.Show();
-                _chatViewModel.Window.OnHidden += Shutdown;
-            };
+
+            _authorizationViewModel.ShowSignInWindow();
+            _authorizationViewModel.OnSignedIn += OnAuthorize;
 
             _appClient.TryStartAsync();
             
-            
             base.OnStartup(e);
         }
-        
 
+        private void OnAuthorize(User authorizedUser)
+        {
+            CurrentUser = authorizedUser;
+            _authorizationViewModel.CloseAllWindows();
+            
+            _chatViewModel.ShowWindow();
+        }
+        
         protected override void OnExit(ExitEventArgs e)
         {
             /*_host.StopAsync();

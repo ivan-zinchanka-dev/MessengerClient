@@ -1,0 +1,45 @@
+﻿<Window x:Class="MessengerClient.Views.SignUpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:MessengerClient.Views"
+        mc:Ignorable="d"
+        Title="Sign up" Height="400" Width="400"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Grid>
+        <StackPanel Margin="50">
+            
+            <TextBox Margin="0 0 0 0"
+                     FontSize="14"
+                     Text="{Binding Nickname, UpdateSourceTrigger=PropertyChanged}"
+            />
+            
+            <TextBox Margin="0 10 0 0"
+                     FontSize="14"
+                     Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
+            />
+            
+            <!--Password="{Binding Password}"-->
+            
+            <TextBlock Margin="0 60 0 0"
+                       FontSize="14"
+                       Text="{Binding ErrorMessage, UpdateSourceTrigger=PropertyChanged}" 
+                       TextAlignment="Center" 
+                       Foreground="Crimson"/>
+            
+            <Button Margin="0 60 0 0" Width="100"
+                    FontSize="14"
+                    Content="Sign in"
+                    Command="{Binding SignInCommand}"
+            />
+            
+            <Button Margin="0 10 0 0" Width="100"
+                    FontSize="14"
+                    Content="Sign up"
+            />
+            
+        </StackPanel>
+    </Grid>
+</Window>

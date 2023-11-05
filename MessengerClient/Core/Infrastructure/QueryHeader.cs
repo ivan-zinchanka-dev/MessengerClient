@@ -3,8 +3,9 @@
 public enum QueryHeader : byte
 {
     None = 0,
-    Login = 1,
-    PostMessage = 2,
-    UpdateChat = 3,
+    SignIn = 1,
+    SignUp = 2,
+    PostMessage = 3,
+    UpdateChat = 4,
     Quit = 10,
 }

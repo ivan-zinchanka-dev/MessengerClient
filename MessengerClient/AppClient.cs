@@ -30,12 +30,25 @@ public class AppClient : IDisposable
         }
     }
 
+    public async void TrySignUpAsync(User user, Action<bool> onCompleteCallback)
+    {
+        NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
+        
+        string jsonMessageBuffer = JsonSerializer.Serialize(user);
+        Query query = new Query(QueryHeader.SignUp, jsonMessageBuffer);
+        await networkAdaptor.SendQueryAsync(query);
+        
+        Response response = await networkAdaptor.ReceiveResponseAsync();
+        bool success = JsonSerializer.Deserialize<bool>(response.JsonDataString);
+        onCompleteCallback?.Invoke(success);
+    }
+    
     public async void TryLoginAsync(User user, Action<bool> onCompleteCallback)
     {
         NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
         
         string jsonMessageBuffer = JsonSerializer.Serialize(user);
-        Query query = new Query(QueryHeader.Login, jsonMessageBuffer);
+        Query query = new Query(QueryHeader.SignIn, jsonMessageBuffer);
         await networkAdaptor.SendQueryAsync(query);
         
         Response response = await networkAdaptor.ReceiveResponseAsync();
