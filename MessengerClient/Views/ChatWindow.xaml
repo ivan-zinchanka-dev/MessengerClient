@@ -26,7 +26,7 @@
                 <DataTemplate>
                     <StackPanel Width="410">
                         <TextBlock TextAlignment="{Binding Path=SenderNickname, Converter= {StaticResource NicknameToTextAlignment}}" Text="{Binding SenderNickname}" FontWeight="Bold"/>
-                        <TextBlock TextWrapping="Wrap" TextAlignment="{Binding Path=SenderNickname, Converter= {StaticResource NicknameToTextAlignment}}" Text="{Binding Text}"/>
+                        <TextBlock TextWrapping="Wrap" TextAlignment="Justify" Text="{Binding Text}"/>
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -47,7 +47,8 @@
         </ListView>
         
         <TextBox Grid.Row="1" Margin="10 10 10 10" 
-                 Text="{Binding MessageInputText}" />
+                 Text="{Binding MessageInputText}"
+                 AcceptsReturn="True"/>
         
         <StackPanel Grid.Row="2" Margin="0 1 10 1">
             <Button VerticalAlignment="Center" HorizontalAlignment="Right" Width="100" 
