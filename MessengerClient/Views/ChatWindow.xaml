@@ -12,6 +12,7 @@
     
     <Window.Resources>
         <converters:NicknameToTextAlignment x:Key="NicknameToTextAlignment"/>
+        <converters:NicknameToHorizontalAlignment x:Key="NicknameToHorizontalAlignment"/>
     </Window.Resources>
     
     <Grid Margin="20">
@@ -26,7 +27,7 @@
                 <DataTemplate>
                     <StackPanel Width="410">
                         <TextBlock TextAlignment="{Binding Path=SenderNickname, Converter= {StaticResource NicknameToTextAlignment}}" Text="{Binding SenderNickname}" FontWeight="Bold"/>
-                        <TextBlock TextWrapping="Wrap" TextAlignment="Justify" Text="{Binding Text}"/>
+                        <TextBlock HorizontalAlignment="{Binding Path=SenderNickname, Converter= {StaticResource NicknameToHorizontalAlignment}}" TextWrapping="Wrap" TextAlignment="Justify" Text="{Binding Text}"/>
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
