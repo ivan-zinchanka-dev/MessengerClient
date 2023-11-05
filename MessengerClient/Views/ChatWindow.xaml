@@ -4,10 +4,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:MessengerClient.Views"
+        xmlns:converters="clr-namespace:MessengerClient.Converters"
         mc:Ignorable="d"
         Title="Chat" Height="700" Width="500"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
+    
+    <Window.Resources>
+        <converters:NicknameToTextAlignment x:Key="NicknameToTextAlignment"/>
+    </Window.Resources>
     
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -20,8 +25,8 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Width="410">
-                        <TextBlock TextAlignment="Left" Text="{Binding SenderNickname}" FontWeight="Bold"/>
-                        <TextBlock TextWrapping="Wrap" TextAlignment="Justify" Text="{Binding Text}"/>
+                        <TextBlock TextAlignment="{Binding Path=SenderNickname, Converter= {StaticResource NicknameToTextAlignment}}" Text="{Binding SenderNickname}" FontWeight="Bold"/>
+                        <TextBlock TextWrapping="Wrap" TextAlignment="{Binding Path=SenderNickname, Converter= {StaticResource NicknameToTextAlignment}}" Text="{Binding Text}"/>
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>

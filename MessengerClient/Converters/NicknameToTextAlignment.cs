@@ -15,12 +15,19 @@ public class NicknameToTextAlignment : IValueConverter
         }
         else
         {
-            return TextAlignment.Center;
+            throw new InvalidOperationException("Value must be a System.String");
         }
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        throw new NotImplementedException();
+        if (value is TextAlignment textAlignment && textAlignment == TextAlignment.Right)
+        {
+            return App.Instance.CurrentUser.Nickname;
+        }
+        else
+        {
+            throw new Exception();
+        }
     }
 }

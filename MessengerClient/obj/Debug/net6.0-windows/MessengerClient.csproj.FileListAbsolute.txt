@@ -57,3 +57,4 @@ D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Messe
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\LoginWindow.g.cs
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\LoginWindow.baml
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\App.baml
+D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\GeneratedInternalTypeHelper.g.cs
