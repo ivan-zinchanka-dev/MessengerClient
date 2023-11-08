@@ -49,7 +49,8 @@ namespace MessengerClient
 
             _authorizationViewModel.ShowSignInWindow();
             _authorizationViewModel.OnSignedIn += OnAuthorize;
-
+            _authorizationViewModel.OnSignedUp += OnAuthorize;
+            
             _appClient.TryStartAsync();
             
             base.OnStartup(e);

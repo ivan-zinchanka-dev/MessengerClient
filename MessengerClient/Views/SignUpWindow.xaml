@@ -21,6 +21,11 @@
                      Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
             />
             
+            <TextBox Margin="0 10 0 0"
+                     FontSize="14"
+                     Text="{Binding PasswordConfirm, UpdateSourceTrigger=PropertyChanged}"
+            />
+            
             <!--Password="{Binding Password}"-->
             
             <TextBlock Margin="0 60 0 0"
@@ -29,15 +34,12 @@
                        TextAlignment="Center" 
                        Foreground="Crimson"/>
             
+          
+            
             <Button Margin="0 60 0 0" Width="100"
                     FontSize="14"
-                    Content="Sign in"
-                    Command="{Binding SignInCommand}"
-            />
-            
-            <Button Margin="0 10 0 0" Width="100"
-                    FontSize="14"
                     Content="Sign up"
+                    Command="{Binding SignUpCommand}"
             />
             
         </StackPanel>

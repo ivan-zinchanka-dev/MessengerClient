@@ -105,10 +105,12 @@ public class AuthorizationViewModel : INotifyPropertyChanged
             {
                 if (_currentView is SignInWindow)
                 {
+                    Console.WriteLine("SwitchToSignUpWindow");
                     SwitchToSignUpWindow();
                 }
                 else if (_currentView is SignUpWindow)
                 {
+                    Console.WriteLine("SignUpIfPossible");
                     SignUpIfPossible();
                 }
             });
@@ -117,8 +119,11 @@ public class AuthorizationViewModel : INotifyPropertyChanged
 
     private void SwitchToSignUpWindow()
     {
-        _signInWindow.Close();
+        //_signInWindow.Closed -= ShutDownApp;
+        _signInWindow.Hide();
+        _currentView = _signUpWindow;
         _signUpWindow.Show();
+        //_signInWindow.Closed += ShutDownApp;
     }
 
     private void SignUpIfPossible()
@@ -135,6 +140,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged
             {
                 if (success)
                 {
+                    ErrorMessage = string.Empty;
                     OnSignedUp?.Invoke(user);
                 }
                 else
@@ -160,9 +166,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         
         _signUpWindow = new SignUpWindow();
         _signUpWindow.DataContext = this;
-
-        _signInWindow.Closed += OnWindowClosedByUser;
-        _signUpWindow.Closed += OnWindowClosedByUser;
+        
+        _signInWindow.Closed += ShutDownApp;
+        _signUpWindow.Closed += ShutDownApp;
     }
 
     public void ShowSignInWindow()
@@ -172,11 +178,11 @@ public class AuthorizationViewModel : INotifyPropertyChanged
 
     public void CloseAllWindows()
     {
-        _signInWindow.Closed -= OnWindowClosedByUser;
-        _signUpWindow.Closed -= OnWindowClosedByUser;
+        /*_signInWindow.Closed -= ShutDownApp;
+        _signUpWindow.Closed -= ShutDownApp;*/
         
-        _signInWindow.Close();
-        _signUpWindow.Close();
+        _signInWindow.Hide();
+        _signUpWindow.Hide();
     }
 
     private void OnAppClientErrorCaptured()
@@ -184,7 +190,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         ErrorMessage = "Connection error";
     }
 
-    private static void OnWindowClosedByUser(object sender, EventArgs e)
+    private static void ShutDownApp(object sender, EventArgs e)
     {
         App.Instance.Shutdown();
     }
