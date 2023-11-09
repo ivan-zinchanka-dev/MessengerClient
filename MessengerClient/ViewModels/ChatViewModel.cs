@@ -12,7 +12,7 @@ namespace MessengerClient.ViewModels;
 public class ChatViewModel : INotifyPropertyChanged
 {
     private ObservableCollection<Message> _messages = new ObservableCollection<Message>();
-    private string _messageInputText = "Input yours";
+    private string _messageInputText;
     private RelayCommand _sendMessageCommand;
     
     private AppClient _appClient;

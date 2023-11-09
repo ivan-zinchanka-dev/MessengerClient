@@ -60,3 +60,4 @@ D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\SignUpWindow.g.cs
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\SignInWindow.baml
 D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Views\SignUpWindow.baml
+D:\Documents\Work\MessengerClient\MessengerClient\obj\Debug\net6.0-windows\Resources\LogicalResources.baml

@@ -15,14 +15,15 @@ public class AuthorizationViewModel : INotifyPropertyChanged
 {
     private const string PasswordRegexPattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$";
     
-    private string _nickname = "Jan Zinch";
-    private string _password = "111111";
-    private string _passwordConfirm = "111111";
+    private string _nickname;           // "Jan Zinch"
+    private string _password;           // "111111"
+    private string _passwordConfirm;    // "111111"
     private string _errorMessage;
     
     private RelayCommand _signInCommand;
     private RelayCommand _signUpCommand;
-
+    private RelayCommand _backCommand;
+    
     private AppClient _appClient;
     private Window _currentView;
 
@@ -98,6 +99,17 @@ public class AuthorizationViewModel : INotifyPropertyChanged
                 {
                     SignUpIfPossible();
                 }
+            });
+        }
+    }
+    
+    public RelayCommand BackCommand
+    {
+        get
+        {
+            return _backCommand ??= new RelayCommand(obj =>
+            {
+                SwitchToSignInWindow();
             });
         }
     }
@@ -217,6 +229,13 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         _signInWindow.Hide();
         _currentView = _signUpWindow;
         _signUpWindow.Show();
+    }
+    
+    private void SwitchToSignInWindow()
+    {
+        _signUpWindow.Hide();
+        _currentView = _signInWindow;
+        _signInWindow.Show();
     }
     
     private void OnAppClientErrorCaptured()
