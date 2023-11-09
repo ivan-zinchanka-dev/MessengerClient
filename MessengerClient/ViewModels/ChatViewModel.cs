@@ -38,6 +38,11 @@ public class ChatViewModel : INotifyPropertyChanged
         {
             return _sendMessageCommand ??= new RelayCommand(obj =>
             {
+                if (string.IsNullOrEmpty(_messageInputText))
+                {
+                    return;                                 // TODO Disable button while it is true
+                }
+
                 Message message = new Message()
                 {
                     SenderNickname = App.Instance.CurrentUser.Nickname,
@@ -47,7 +52,7 @@ public class ChatViewModel : INotifyPropertyChanged
                 };
                 
                 _messages.Add(message);
-                
+
                 _appClient.PostMessagesAsync(message, success =>
                 {
                     Console.WriteLine(success? "posted" : "not_posted");

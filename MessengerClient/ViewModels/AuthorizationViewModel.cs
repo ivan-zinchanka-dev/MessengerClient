@@ -149,17 +149,25 @@ public class AuthorizationViewModel : INotifyPropertyChanged
             return false;
         }
 
-        Regex regex = new Regex(PasswordRegexPattern);
-            
-        if (!regex.IsMatch(Password))
+        if (_currentView is SignUpWindow)
         {
-            ErrorMessage = "Password should has at least 8 characters " +
-                           "and contains numbers, uppercase and lowercase latin letters";
-            return false;
+            Regex regex = new Regex(PasswordRegexPattern);
+            
+            if (!regex.IsMatch(Password))
+            {
+                ErrorMessage = "Password should has at least 8 characters " +
+                               "and contains numbers, uppercase and lowercase latin letters";
+                return false;
+            }
+            
+            if (Password != PasswordConfirm)
+            {
+                ErrorMessage = "Passwords mismatch";
+                return false;
+            }
         }
-
-        ErrorMessage = string.Empty;
         
+        ErrorMessage = string.Empty;
         return true;
     }
     
@@ -195,12 +203,6 @@ public class AuthorizationViewModel : INotifyPropertyChanged
     {
         if (!Validate())
         {
-            return;
-        }
-
-        if (Password != PasswordConfirm)
-        {
-            ErrorMessage = "Passwords mismatch";
             return;
         }
         
