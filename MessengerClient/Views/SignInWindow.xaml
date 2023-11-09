@@ -11,13 +11,13 @@
         ResizeMode="NoResize">
     
     <Window.Resources>
-        <Style x:Key="Placeholder" TargetType="TextBox">
+        <Style x:Key="HintTextBox" TargetType="TextBox">
             <Style.Triggers>
                 <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
-                    <Setter Property="Background" Value="{DynamicResource CueBannerBrush}" />
+                    <Setter Property="Background" Value="{DynamicResource HintBrush}" />
                 </Trigger>
                 <Trigger Property="Text" Value="{x:Null}"> 
-                    <Setter Property="Background" Value="{DynamicResource CueBannerBrush}" />
+                    <Setter Property="Background" Value="{DynamicResource HintBrush}" />
                 </Trigger>
                 <Trigger Property="IsKeyboardFocused" Value="True">
                     <Setter Property="Background" Value="White" />
@@ -33,22 +33,22 @@
             <TextBox Margin="0 0 0 0"
                      FontSize="14"
                      Text="{Binding Nickname, UpdateSourceTrigger=PropertyChanged}"
-                     Style="{StaticResource Placeholder}">
+                     Style="{StaticResource HintTextBox}">
                 <TextBox.Resources>
-                    <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                    <VisualBrush x:Key="HintBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                         <VisualBrush.Visual>
                             <Label Content="Nickname" Foreground="Gray" />
                         </VisualBrush.Visual>
-                    </VisualBrush>
+                    </VisualBrush> 
                 </TextBox.Resources>
             </TextBox>
             
             <TextBox Margin="0 10 0 0"
                      FontSize="14"
                      Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
-                     Style="{StaticResource Placeholder}">
+                     Style="{StaticResource HintTextBox}">
                 <TextBox.Resources>
-                    <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                    <VisualBrush x:Key="HintBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                         <VisualBrush.Visual>
                             <Label Content="Password" Foreground="Gray" />
                         </VisualBrush.Visual>
