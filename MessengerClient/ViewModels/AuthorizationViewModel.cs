@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using MessengerClient.Commands;
@@ -12,10 +13,13 @@ namespace MessengerClient.ViewModels;
 
 public class AuthorizationViewModel : INotifyPropertyChanged
 {
+    private const string PasswordRegexPattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$";
+    
     private string _nickname = "Jan Zinch";
     private string _password = "111111";
     private string _passwordConfirm = "111111";
     private string _errorMessage;
+    
     private RelayCommand _signInCommand;
     private RelayCommand _signUpCommand;
 
@@ -75,24 +79,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         {
             return _signInCommand ??= new RelayCommand(obj =>
             {
-                User user = new User()
-                {
-                    Nickname = Nickname,
-                    Password = Password
-                };
-                
-                _appClient.TryLoginAsync(user, success =>
-                {
-                    if (success)
-                    {
-                        OnSignedIn?.Invoke(user);
-                    }
-                    else
-                    {
-                        ErrorMessage = "User not exist";
-                    }
-                });
-                
+                SignInIfPossible();
             });
         }
     }
@@ -105,56 +92,16 @@ public class AuthorizationViewModel : INotifyPropertyChanged
             {
                 if (_currentView is SignInWindow)
                 {
-                    Console.WriteLine("SwitchToSignUpWindow");
                     SwitchToSignUpWindow();
                 }
                 else if (_currentView is SignUpWindow)
                 {
-                    Console.WriteLine("SignUpIfPossible");
                     SignUpIfPossible();
                 }
             });
         }
     }
-
-    private void SwitchToSignUpWindow()
-    {
-        //_signInWindow.Closed -= ShutDownApp;
-        _signInWindow.Hide();
-        _currentView = _signUpWindow;
-        _signUpWindow.Show();
-        //_signInWindow.Closed += ShutDownApp;
-    }
-
-    private void SignUpIfPossible()
-    {
-        if (Password == PasswordConfirm)
-        {
-            User user = new User()
-            {
-                Nickname = Nickname,
-                Password = Password
-            };
-                    
-            _appClient.TrySignUpAsync(user, success =>
-            {
-                if (success)
-                {
-                    ErrorMessage = string.Empty;
-                    OnSignedUp?.Invoke(user);
-                }
-                else
-                {
-                    ErrorMessage = "This nickname is already taken";
-                }
-            });
-        }
-        else
-        {
-            ErrorMessage = "Passwords mismatch";
-        }
-    }
-
+    
     public AuthorizationViewModel(AppClient appClient)
     {
         _appClient = appClient;
@@ -167,8 +114,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         _signUpWindow = new SignUpWindow();
         _signUpWindow.DataContext = this;
         
-        _signInWindow.Closed += ShutDownApp;
-        _signUpWindow.Closed += ShutDownApp;
+        _signInWindow.Closed += OnWindowClosed;
+        _signUpWindow.Closed += OnWindowClosed;
     }
 
     public void ShowSignInWindow()
@@ -176,21 +123,108 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         _signInWindow.Show();
     }
 
-    public void CloseAllWindows()
+    public void HideAllWindows()
     {
-        /*_signInWindow.Closed -= ShutDownApp;
-        _signUpWindow.Closed -= ShutDownApp;*/
-        
         _signInWindow.Hide();
         _signUpWindow.Hide();
     }
 
+    private bool Validate()
+    {
+        if (string.IsNullOrEmpty(Nickname))
+        {
+            ErrorMessage = "Nickname should not be empty";
+            return false;
+        }
+
+        Regex regex = new Regex(PasswordRegexPattern);
+            
+        if (!regex.IsMatch(Password))
+        {
+            ErrorMessage = "Password should has at least 8 characters " +
+                           "and contains numbers, uppercase and lowercase latin letters";
+            return false;
+        }
+
+        ErrorMessage = string.Empty;
+        
+        return true;
+    }
+    
+    private void SignInIfPossible()
+    {
+        if (!Validate())
+        {
+            return;
+        }
+
+        User user = new User()
+        {
+            Nickname = Nickname,
+            Password = Password
+        };
+                
+        _appClient.TryLoginAsync(user, success =>
+        {
+            if (success)
+            {
+                ErrorMessage = string.Empty;
+                OnSignedIn?.Invoke(user);
+            }
+            else
+            {
+                ErrorMessage = "User not exist";
+            }
+        });
+        
+    }
+
+    private void SignUpIfPossible()
+    {
+        if (!Validate())
+        {
+            return;
+        }
+
+        if (Password != PasswordConfirm)
+        {
+            ErrorMessage = "Passwords mismatch";
+            return;
+        }
+        
+        User user = new User()
+        {
+            Nickname = Nickname,
+            Password = Password
+        };
+                    
+        _appClient.TrySignUpAsync(user, success =>
+        {
+            if (success)
+            {
+                ErrorMessage = string.Empty;
+                OnSignedUp?.Invoke(user);
+            }
+            else
+            {
+                ErrorMessage = "This nickname is already taken";
+            }
+        });
+    }
+
+    private void SwitchToSignUpWindow()
+    {
+        _signInWindow.Hide();
+        _currentView = _signUpWindow;
+        _signUpWindow.Show();
+    }
+    
     private void OnAppClientErrorCaptured()
     {
         ErrorMessage = "Connection error";
     }
 
-    private static void ShutDownApp(object sender, EventArgs e)
+    private static void OnWindowClosed(object sender, EventArgs e)
     {
         App.Instance.Shutdown();
     }

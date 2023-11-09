@@ -59,7 +59,7 @@ namespace MessengerClient
         private void OnAuthorize(User authorizedUser)
         {
             CurrentUser = authorizedUser;
-            _authorizationViewModel.CloseAllWindows();
+            _authorizationViewModel.HideAllWindows();
             
             _chatViewModel.ShowWindow();
         }
