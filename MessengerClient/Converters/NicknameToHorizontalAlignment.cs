@@ -7,6 +7,8 @@ namespace MessengerClient.Converters;
 
 public class NicknameToHorizontalAlignment : IValueConverter
 {
+    // TODO переделать через триггеры
+    
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is string nickname)

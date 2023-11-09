@@ -3,11 +3,29 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:MessengerClient"
         mc:Ignorable="d"
         Title="Login" Height="400" Width="400"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
+    
+    <Window.Resources>
+        <Style x:Key="Placeholder" TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                    <Setter Property="Background" Value="{DynamicResource CueBannerBrush}" />
+                </Trigger>
+                <Trigger Property="Text" Value="{x:Null}"> 
+                    <Setter Property="Background" Value="{DynamicResource CueBannerBrush}" />
+                </Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="Background" Value="White" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
     <Grid>
         
         <StackPanel Margin="50">
@@ -15,14 +33,29 @@
             <TextBox Margin="0 0 0 0"
                      FontSize="14"
                      Text="{Binding Nickname, UpdateSourceTrigger=PropertyChanged}"
-                     />
+                     Style="{StaticResource Placeholder}">
+                <TextBox.Resources>
+                    <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                        <VisualBrush.Visual>
+                            <Label Content="Nickname" Foreground="Gray" />
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </TextBox.Resources>
+            </TextBox>
             
             <TextBox Margin="0 10 0 0"
                      FontSize="14"
                      Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
-            />
+                     Style="{StaticResource Placeholder}">
+                <TextBox.Resources>
+                    <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                        <VisualBrush.Visual>
+                            <Label Content="Password" Foreground="Gray" />
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </TextBox.Resources>
+            </TextBox>
             
-            <!--Password="{Binding Password}"-->
             
             <TextBlock Margin="0 60 0 0"
                        FontSize="14"
