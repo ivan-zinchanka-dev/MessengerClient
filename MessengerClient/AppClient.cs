@@ -13,6 +13,8 @@ public class AppClient : IDisposable
 {
     private TcpClient _tcpClient;
 
+    // TODO Reconnect logic
+    
     public event Action ErrorCaptured;
     
     public async void TryStartAsync()
@@ -71,9 +73,7 @@ public class AppClient : IDisposable
     public async void PostMessagesAsync(Message message, Action<bool> onCompleteCallback)
     {
         NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
-        
         Query query = new Query(QueryHeader.PostMessage, JsonSerializer.Serialize(message));
-
         await networkAdaptor.SendQueryAsync(query);
         
         Response response = await networkAdaptor.ReceiveResponseAsync();

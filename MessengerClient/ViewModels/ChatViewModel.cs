@@ -38,7 +38,7 @@ public class ChatViewModel : INotifyPropertyChanged
         {
             return _sendMessageCommand ??= new RelayCommand(obj =>
             {
-                if (string.IsNullOrEmpty(_messageInputText))
+                if (_messageInputText == string.Empty || string.IsNullOrWhiteSpace(_messageInputText))
                 {
                     return;                                 // TODO Disable button while it is true
                 }
@@ -55,7 +55,8 @@ public class ChatViewModel : INotifyPropertyChanged
 
                 _appClient.PostMessagesAsync(message, success =>
                 {
-                    Console.WriteLine(success? "posted" : "not_posted");
+                    MessageInputText = string.Empty;
+                    //Console.WriteLine(success? "posted" : "not_posted");
                 });
                 
             });
