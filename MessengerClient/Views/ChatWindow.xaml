@@ -45,7 +45,7 @@
         </ListView>
         
         <TextBox x:Name="_messageTextBox" Grid.Row="1" Margin="0 10 0 10" 
-                 Text="{Binding MessageInputText}"
+                 Text="{Binding MessageInputText, UpdateSourceTrigger=PropertyChanged}"
                  AcceptsReturn="True"
                  Style="{StaticResource HintTextBox}">
             <TextBox.Resources>
@@ -60,19 +60,9 @@
         <StackPanel Grid.Row="2" Margin="0 1 0 1">
             <Button VerticalAlignment="Center" HorizontalAlignment="Right" 
                     Width="100"
-                    Content="Send" 
+                    Content="Send"
+                    IsEnabled="{Binding IsSendMessageAllowed}"
                     Command="{Binding SendMessageCommand}">
-                
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="IsEnabled" Value="True" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Text, ElementName=_messageTextBox}" Value="">
-                                <Setter Property="IsEnabled" Value="False" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
             </Button>
         </StackPanel>
         

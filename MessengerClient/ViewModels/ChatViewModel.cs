@@ -13,6 +13,7 @@ public class ChatViewModel : INotifyPropertyChanged
 {
     private ObservableCollection<Message> _messages = new ObservableCollection<Message>();
     private string _messageInputText;
+    private bool _isSendMessageAllowed;
     private RelayCommand _sendMessageCommand;
     
     private AppClient _appClient;
@@ -31,14 +32,25 @@ public class ChatViewModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-    
+
+    public bool IsSendMessageAllowed
+    {
+        get => _isSendMessageAllowed;
+
+        set
+        {
+            _isSendMessageAllowed = value;
+            OnPropertyChanged();
+        }
+    }
+
     public RelayCommand SendMessageCommand
     {
         get
         {
             return _sendMessageCommand ??= new RelayCommand(obj =>
             {
-                if (_messageInputText == string.Empty || string.IsNullOrWhiteSpace(_messageInputText))
+                if (!IsSendMessageAllowed)
                 {
                     return;                                 // TODO Disable button while it is true
                 }
@@ -97,6 +109,11 @@ public class ChatViewModel : INotifyPropertyChanged
     
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
+        if (propertyName == nameof(MessageInputText))
+        {
+            IsSendMessageAllowed = !string.IsNullOrWhiteSpace(_messageInputText) && _messageInputText != string.Empty;
+        }
+
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
