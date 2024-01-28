@@ -22,7 +22,7 @@
                         </VisualBrush.Visual>
                     </VisualBrush> 
                 </TextBox.Resources>
-            </TextBox>
+            </TextBox> 
             
             <TextBox Margin="0 10 0 0" Width="200"
                      FontSize="14"
