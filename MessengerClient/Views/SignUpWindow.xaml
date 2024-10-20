@@ -19,7 +19,9 @@
                 <TextBox.Resources>
                     <VisualBrush x:Key="HintBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                         <VisualBrush.Visual>
-                            <Label Content="Nickname" Foreground="Gray" />
+                            <Border Width="200">
+                                <Label Content="Nickname" Foreground="Gray" Background="White" />
+                            </Border>
                         </VisualBrush.Visual>
                     </VisualBrush> 
                 </TextBox.Resources>
@@ -33,7 +35,9 @@
                 <TextBox.Resources>
                     <VisualBrush x:Key="HintBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                         <VisualBrush.Visual>
-                            <Label Content="Password" Foreground="Gray" />
+                            <Border Width="200">
+                                <Label Content="Password" Foreground="Gray" Background="White" />
+                            </Border>
                         </VisualBrush.Visual>
                     </VisualBrush>
                 </TextBox.Resources>
@@ -47,7 +51,9 @@
                 <TextBox.Resources>
                     <VisualBrush x:Key="HintBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                         <VisualBrush.Visual>
-                            <Label Content="Confirm password" Foreground="Gray" />
+                            <Border Width="200">
+                                <Label Content="Confirm password" Foreground="Gray" Background="White" />
+                            </Border>
                         </VisualBrush.Visual>
                     </VisualBrush>
                 </TextBox.Resources>
@@ -65,15 +71,13 @@
                     FontSize="13"
                     Content="Sign up"
                     Command="{Binding SignUpCommand}"
-                    Style="{StaticResource InformButton}"
-            />
+                    Style="{StaticResource InformButton}"/>
             
             <Button Margin="0 10 0 0" Width="80"
                     FontSize="13"
                     Content="Back"
                     Command="{Binding BackCommand}"
-                    Style="{StaticResource InformButton}"
-            />
+                    Style="{StaticResource InformButton}"/>
             
         </StackPanel>
     </Grid>

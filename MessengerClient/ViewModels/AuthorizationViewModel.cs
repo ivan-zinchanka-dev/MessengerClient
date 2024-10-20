@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using MessengerClient.Commands;
 using MessengerClient.Core.Models;
@@ -15,9 +13,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged
 {
     private const string PasswordRegexPattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$";
     
-    private string _nickname = "Arnold";           // "Jan Zinch"
-    private string _password = "Duo12300";           // "111111"
-    private string _passwordConfirm;    // "111111"
+    private string _nickname = "Jan Zinch";           // "Jan Zinch"
+    private string _password = "1111aBll";           // "1111aBll"
+    private string _passwordConfirm;
     private string _errorMessage;
     
     private RelayCommand _signInCommand;

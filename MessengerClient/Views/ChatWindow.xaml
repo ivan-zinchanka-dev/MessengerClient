@@ -8,7 +8,8 @@
         mc:Ignorable="d"
         Title="Chat" Height="700" Width="500"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        Background="#bae7ff">
     
     <Window.Resources>
         <converters:NicknameToTextAlignment x:Key="NicknameToTextAlignment"/>
@@ -51,7 +52,9 @@
             <TextBox.Resources>
                 <VisualBrush x:Key="HintBrush" AlignmentX="Left" AlignmentY="Top" Stretch="None">
                     <VisualBrush.Visual>
-                        <Label Content="Write message..." Foreground="Gray" />
+                        <Border Width="500" Height="150">
+                            <Label Content="Write message..." Foreground="Gray" Background="White" />
+                        </Border>
                     </VisualBrush.Visual>
                 </VisualBrush> 
             </TextBox.Resources>
@@ -62,7 +65,8 @@
                     Width="100"
                     Content="Send"
                     IsEnabled="{Binding IsSendMessageAllowed}"
-                    Command="{Binding SendMessageCommand}">
+                    Command="{Binding SendMessageCommand}"
+                    Style="{StaticResource InformButton}">
             </Button>
         </StackPanel>
         
