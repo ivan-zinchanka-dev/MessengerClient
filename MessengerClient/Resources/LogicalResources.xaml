@@ -74,31 +74,34 @@
                     </Trigger>
         			<Trigger Property="IsPressed" Value="True">					
         				<Setter Property="Background" >
-        				<Setter.Value>
-        					<LinearGradientBrush StartPoint="0,0" EndPoint="0,1" >
-        						<GradientStop Color="#009dff" Offset="0"/>
-        						<GradientStop Color="#00c8ff" Offset="0.5"/>
-        						<GradientStop Color="#009dff" Offset="1"/>
-        					</LinearGradientBrush>
-        				</Setter.Value>
+        					<Setter.Value>
+        						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1" >
+        							<GradientStop Color="#009dff" Offset="0"/>
+        							<GradientStop Color="#00c8ff" Offset="0.5"/>
+        							<GradientStop Color="#009dff" Offset="1"/>
+        						</LinearGradientBrush>
+        					</Setter.Value>
         				</Setter>
         				<Setter TargetName="content" Property="RenderTransform" >
-        				<Setter.Value>
-        					<TranslateTransform Y="1.0" />
-        				</Setter.Value>
+        					<Setter.Value>
+        						<TranslateTransform Y="1.0" />
+        					</Setter.Value>
         				</Setter>
-        			</Trigger>
-        			<Trigger Property="IsDefaulted" Value="True">
-        				<Setter TargetName="border" Property="BorderBrush" Value="DimGray" />
-        			</Trigger>
-        			<Trigger Property="IsFocused" Value="True">
-        				<Setter TargetName="border" Property="BorderBrush" Value="DimGray" />
         			</Trigger>
         			<Trigger Property="IsEnabled" Value="False">
         				<Setter TargetName="border" Property="Opacity" Value="0.7" />
+				        <Setter TargetName="border" Property="BorderBrush" Value="#262626" />
         				<Setter Property="Foreground" Value="Gray" />
+				        <Setter Property="Background" >
+					        <Setter.Value>
+						        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" >
+							        <GradientStop Color="#dbdbdb" Offset="0"/>
+							        <GradientStop Color="#bfbfbf" Offset="0.5"/>
+							        <GradientStop Color="#dbdbdb" Offset="1"/>
+						        </LinearGradientBrush>
+					        </Setter.Value>
+				        </Setter>
         			</Trigger>
-    
         		</ControlTemplate.Triggers>
         	</ControlTemplate>
         </Setter.Value>
