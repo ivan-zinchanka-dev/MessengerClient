@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Security;
 using System.Windows;
 
-namespace MessengerClient
+namespace MessengerClient.Views
 {
     public partial class SignInWindow : Window
     {
@@ -12,7 +11,12 @@ namespace MessengerClient
         {
             InitializeComponent();
         }
-        
+
+        public void SetControlsEnabled(bool controlsEnabled)
+        {
+            _signInButton.IsEnabled = _signUpButton.IsEnabled = controlsEnabled;
+        }
+
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);

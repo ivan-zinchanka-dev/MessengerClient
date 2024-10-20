@@ -3,7 +3,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using MessengerClient.Core.Infrastructure;
 
-namespace MessengerClient;
+namespace MessengerClient.Network;
 
 public class NetworkAdaptor
 {

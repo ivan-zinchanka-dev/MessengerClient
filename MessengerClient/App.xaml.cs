@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using MessengerClient.Core.Models;
+using MessengerClient.Network;
 using MessengerClient.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -46,12 +47,13 @@ namespace MessengerClient
             _appClient = new AppClient();
             _authorizationViewModel = new AuthorizationViewModel(_appClient);
             _chatViewModel = new ChatViewModel(_appClient);
-
-            _authorizationViewModel.ShowSignInWindow();
-            _authorizationViewModel.OnSignedIn += OnAuthorize;
-            _authorizationViewModel.OnSignedUp += OnAuthorize;
             
-            _appClient.TryStartAsync();
+            _appClient.TryConnectAsync((b) =>
+            {
+                _authorizationViewModel.ShowSignInWindow();
+                _authorizationViewModel.OnSignedIn += OnAuthorize;
+                _authorizationViewModel.OnSignedUp += OnAuthorize;
+            });
             
             base.OnStartup(e);
         }
@@ -76,10 +78,5 @@ namespace MessengerClient
             
             base.OnExit(e);
         }
-
-
-        
-        
-        
     }
 }

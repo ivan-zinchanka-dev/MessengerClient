@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Sockets;
 using System.Text.Json;
-using System.Threading.Tasks;
 using MessengerClient.Core.Infrastructure;
 using MessengerClient.Core.Models;
 
-namespace MessengerClient;
+namespace MessengerClient.Network;
 
 public class AppClient : IDisposable
 {
@@ -16,8 +14,10 @@ public class AppClient : IDisposable
     // TODO Reconnect logic
     
     public event Action ErrorCaptured;
-    
-    public async void TryStartAsync()
+
+    public bool IsConnected { get; private set; }
+
+    public async void TryConnectAsync(Action<bool> onCompleteCallback)
     {
         try
         {
@@ -25,15 +25,26 @@ public class AppClient : IDisposable
             await _tcpClient.ConnectAsync("127.0.0.1", 8888);
             
             Console.WriteLine("Connected to server");
+
+            IsConnected = true;
+            onCompleteCallback?.Invoke(IsConnected);
         }
         catch (SocketException ex)
         {
+            IsConnected = false;
+            onCompleteCallback?.Invoke(IsConnected);
             ErrorCaptured?.Invoke();
         }
     }
 
     public async void TrySignUpAsync(User user, Action<bool> onCompleteCallback)
     {
+        if (!IsConnected)
+        {
+            onCompleteCallback?.Invoke(IsConnected);
+            return;
+        }
+
         NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
         
         string jsonMessageBuffer = JsonSerializer.Serialize(user);
@@ -47,6 +58,12 @@ public class AppClient : IDisposable
     
     public async void TryLoginAsync(User user, Action<bool> onCompleteCallback)
     {
+        if (!IsConnected)
+        {
+            onCompleteCallback?.Invoke(IsConnected);
+            return;
+        }
+        
         NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
         
         string jsonMessageBuffer = JsonSerializer.Serialize(user);
@@ -60,6 +77,12 @@ public class AppClient : IDisposable
 
     public async void GetMessagesAsync(Action<List<Message>> onCompleteCallback)
     {
+        if (!IsConnected)
+        {
+            onCompleteCallback?.Invoke(new List<Message>());
+            return;
+        }
+        
         NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
         
         Query query = new Query(QueryHeader.UpdateChat);
@@ -72,6 +95,12 @@ public class AppClient : IDisposable
     
     public async void PostMessagesAsync(Message message, Action<bool> onCompleteCallback)
     {
+        if (!IsConnected)
+        {
+            onCompleteCallback?.Invoke(IsConnected);
+            return;
+        }
+        
         NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
         Query query = new Query(QueryHeader.PostMessage, JsonSerializer.Serialize(message));
         await networkAdaptor.SendQueryAsync(query);
@@ -83,6 +112,12 @@ public class AppClient : IDisposable
     
     public async void QuitAsync(Action onCompleteCallback)
     {
+        if (!IsConnected)
+        {
+            onCompleteCallback?.Invoke();
+            return;
+        }
+        
         NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
 
         Query query = new Query(QueryHeader.Quit);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using MessengerClient.Core.Models;
 
-namespace MessengerClient;
+namespace MessengerClient.Network;
 
 public class ChatUpdater
 {

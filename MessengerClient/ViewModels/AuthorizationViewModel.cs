@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using MessengerClient.Commands;
 using MessengerClient.Core.Models;
+using MessengerClient.Network;
 using MessengerClient.Views;
 
 namespace MessengerClient.ViewModels;
@@ -12,6 +13,7 @@ namespace MessengerClient.ViewModels;
 public class AuthorizationViewModel : INotifyPropertyChanged
 {
     private const string PasswordRegexPattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$";
+    private const string ConnectionErrorMessage = "Connection error";
     
     private string _nickname = "Jan Zinch";           // "Jan Zinch"
     private string _password = "1111aBll";           // "1111aBll"
@@ -89,7 +91,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         {
             return _signUpCommand ??= new RelayCommand(obj =>
             {
-                if (_currentView is SignInWindow)
+                if (_currentView is SignInWindow && _appClient.IsConnected)
                 {
                     SwitchToSignUpWindow();
                 }
@@ -169,61 +171,68 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         return true;
     }
     
-    private void SignInIfPossible()
+    private bool TryGetValidatedUser(out User user)
     {
-        if (!Validate())
+        user = null;
+        
+        if (!_appClient.IsConnected)
         {
-            return;
+            ErrorMessage = ConnectionErrorMessage;
+            return false;
         }
 
-        User user = new User()
+        if (!Validate())
+        {
+            return false;
+        }
+        
+        user = new User()
         {
             Nickname = Nickname,
             Password = Password
         };
-                
-        _appClient.TryLoginAsync(user, success =>
+
+        return true;
+    }
+    
+    private void SignInIfPossible()
+    {
+        if (TryGetValidatedUser(out User user))
         {
-            if (success)
+            _appClient.TryLoginAsync(user, success =>
             {
-                ErrorMessage = string.Empty;
-                OnSignedIn?.Invoke(user);
-            }
-            else
-            {
-                ErrorMessage = "User not exist";
-            }
-        });
-        
+                if (success)
+                {
+                    ErrorMessage = string.Empty;
+                    OnSignedIn?.Invoke(user);
+                }
+                else
+                {
+                    ErrorMessage = _appClient.IsConnected ? "User not exist" : ConnectionErrorMessage;
+                }
+            });
+        }
     }
 
     private void SignUpIfPossible()
     {
-        if (!Validate())
+        if (TryGetValidatedUser(out User user))
         {
-            return;
+            _appClient.TrySignUpAsync(user, success =>
+            {
+                if (success)
+                {
+                    ErrorMessage = string.Empty;
+                    OnSignedUp?.Invoke(user);
+                }
+                else
+                {
+                    ErrorMessage = _appClient.IsConnected ? "This nickname is already taken" : ConnectionErrorMessage;
+                }
+            });
         }
-        
-        User user = new User()
-        {
-            Nickname = Nickname,
-            Password = Password
-        };
-                    
-        _appClient.TrySignUpAsync(user, success =>
-        {
-            if (success)
-            {
-                ErrorMessage = string.Empty;
-                OnSignedUp?.Invoke(user);
-            }
-            else
-            {
-                ErrorMessage = "This nickname is already taken";
-            }
-        });
     }
-
+    
     private void SwitchToSignUpWindow()
     {
         _signInWindow.Hide();
@@ -240,7 +249,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged
     
     private void OnAppClientErrorCaptured()
     {
-        ErrorMessage = "Connection error";
+        ErrorMessage = ConnectionErrorMessage;
     }
 
     private static void OnWindowClosed(object sender, EventArgs e)
