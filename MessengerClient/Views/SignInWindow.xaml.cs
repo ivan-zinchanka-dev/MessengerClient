@@ -11,12 +11,7 @@ namespace MessengerClient.Views
         {
             InitializeComponent();
         }
-
-        public void SetControlsEnabled(bool controlsEnabled)
-        {
-            _signInButton.IsEnabled = _signUpButton.IsEnabled = controlsEnabled;
-        }
-
+        
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);

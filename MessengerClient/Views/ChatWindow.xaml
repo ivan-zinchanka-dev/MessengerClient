@@ -23,12 +23,14 @@
             <RowDefinition Height="0.05*"/>
         </Grid.RowDefinitions>
         
-        <ListView Grid.Row="0" x:FieldModifier="private" x:Name="_messagesListView" ScrollViewer.CanContentScroll="False">
+        <ListView Grid.Row="0" ItemsSource="{Binding Path= Messages}" ScrollViewer.CanContentScroll="False">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Width="410">
-                        <TextBlock TextAlignment="{Binding Path=SenderNickname, Converter= {StaticResource NicknameToTextAlignment}}" Text="{Binding SenderNickname}" FontWeight="Bold"/>
-                        <TextBlock HorizontalAlignment="{Binding Path=SenderNickname, Converter= {StaticResource NicknameToHorizontalAlignment}}" TextWrapping="Wrap" TextAlignment="Justify" Text="{Binding Text}"/>
+                        <TextBlock TextAlignment="{Binding Path=SenderNickname, Converter= {StaticResource NicknameToTextAlignment}}" 
+                                   Text="{Binding SenderNickname}" FontWeight="Bold"/>
+                        <TextBlock HorizontalAlignment="{Binding Path=SenderNickname, Converter= {StaticResource NicknameToHorizontalAlignment}}" 
+                                   TextWrapping="Wrap" TextAlignment="Justify" Text="{Binding Text}"/>
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>

@@ -8,16 +8,16 @@ public partial class ChatWindow : Window
 {
     public event Action OnHidden;
     
-    public IEnumerable MessagesListViewSource
+    /*public IEnumerable MessagesListViewSource
     {
         get => _messagesListView.ItemsSource;
         set => _messagesListView.ItemsSource = value;
-    }
+    }*/
     
-    public void Refresh()
+    /*public void Refresh()
     {
         _messagesListView.Items.Refresh();
-    }
+    }*/
 
     public ChatWindow()
     {

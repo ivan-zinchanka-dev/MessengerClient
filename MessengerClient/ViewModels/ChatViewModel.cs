@@ -45,15 +45,28 @@ public class ChatViewModel : INotifyPropertyChanged
         }
     }
 
+    public ObservableCollection<Message> Messages
+    {
+        get => _messages;
+
+        set
+        {
+            _messages = value;
+            OnPropertyChanged();
+        }
+    }
+
     public RelayCommand SendMessageCommand
     {
+        // TODO ADD HOTKEY
+        
         get
         {
             return _sendMessageCommand ??= new RelayCommand(obj =>
             {
                 if (!IsSendMessageAllowed)
                 {
-                    return;                                 // TODO Disable button while it is true
+                    return;
                 }
 
                 Message message = new Message()
@@ -83,7 +96,7 @@ public class ChatViewModel : INotifyPropertyChanged
 
         _window = new ChatWindow();
         _window.DataContext = this;
-        _window.MessagesListViewSource = _messages;
+        //_window.MessagesListViewSource = _messages;
     }
 
     public void ShowWindow()
@@ -97,8 +110,8 @@ public class ChatViewModel : INotifyPropertyChanged
     {
         _window.Dispatcher.Invoke(() =>
         {
-            _messages = new ObservableCollection<Message>(actualMessages);
-            _window.MessagesListViewSource = _messages;
+            Messages = new ObservableCollection<Message>(actualMessages);
+            //_window.MessagesListViewSource = _messages;
             Console.WriteLine("Updated");
         });
     }
