@@ -7,8 +7,8 @@ namespace MessengerClient.Network;
 
 public class NetworkAdaptor
 {
-    private StreamReader _reader;
-    private StreamWriter _writer;
+    private readonly StreamReader _reader;
+    private readonly StreamWriter _writer;
 
     public NetworkAdaptor(NetworkStream stream)
     {

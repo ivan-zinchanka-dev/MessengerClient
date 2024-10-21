@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text.Json;
+using System.Threading.Tasks;
 using MessengerClient.Core.Infrastructure;
 using MessengerClient.Core.Models;
 
@@ -17,7 +18,7 @@ public class AppClient : IDisposable
 
     public bool IsConnected { get; private set; }
 
-    public async void TryConnectAsync(Action<bool> onCompleteCallback)
+    public async Task<bool> TryConnectAsync()
     {
         try
         {
@@ -27,14 +28,14 @@ public class AppClient : IDisposable
             Console.WriteLine("Connected to server");
 
             IsConnected = true;
-            onCompleteCallback?.Invoke(IsConnected);
         }
         catch (SocketException ex)
         {
             IsConnected = false;
-            onCompleteCallback?.Invoke(IsConnected);
             ErrorCaptured?.Invoke();
         }
+
+        return IsConnected;
     }
 
     public async void TrySignUpAsync(User user, Action<bool> onCompleteCallback)
@@ -110,11 +111,10 @@ public class AppClient : IDisposable
         onCompleteCallback?.Invoke(success);
     }
     
-    public async void QuitAsync(Action onCompleteCallback)
+    public async Task QuitAsync()
     {
         if (!IsConnected)
         {
-            onCompleteCallback?.Invoke();
             return;
         }
         
@@ -122,8 +122,6 @@ public class AppClient : IDisposable
 
         Query query = new Query(QueryHeader.Quit);
         await networkAdaptor.SendQueryAsync(query);
-        
-        onCompleteCallback?.Invoke();
     }
     
     public void Dispose()

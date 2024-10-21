@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Windows;
 using MessengerClient.Core.Models;
 using MessengerClient.Network;
@@ -19,12 +13,9 @@ namespace MessengerClient
     {
         public static App Instance { get; private set; }
 
-        //private readonly IHost _host;
-
-        private AppClient _appClient;
-
-        private INotifyPropertyChanged _currentViewModel;
+        private readonly IHost _host;
         
+        private AppClient _appClient;
         private AuthorizationViewModel _authorizationViewModel;
         private ChatViewModel _chatViewModel;
 
@@ -34,26 +25,32 @@ namespace MessengerClient
         {
             Instance = this;
             
-            /*_host = Host.CreateDefaultBuilder()
-                .ConfigureServices((services) =>
+            _host = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
                 {
-                    services.AddSingleton<LoginWindow>();
+                    services
+                        .AddSingleton<AppClient>()
+                        .AddSingleton<AuthorizationViewModel>()
+                        .AddSingleton<ChatViewModel>();
+                    
                 })
-                .Build();*/
+                .Build();
         }
         
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
-            _appClient = new AppClient();
-            _authorizationViewModel = new AuthorizationViewModel(_appClient);
-            _chatViewModel = new ChatViewModel(_appClient);
+            await _host.StartAsync().ConfigureAwait(false);
+
+            _appClient = _host.Services.GetRequiredService<AppClient>();
+
+            bool isConnected = await _appClient.TryConnectAsync();
+
+            _authorizationViewModel = _host.Services
+                .GetRequiredService<AuthorizationViewModel>();
             
-            _appClient.TryConnectAsync((b) =>
-            {
-                _authorizationViewModel.ShowSignInWindow();
-                _authorizationViewModel.OnSignedIn += OnAuthorize;
-                _authorizationViewModel.OnSignedUp += OnAuthorize;
-            });
+            _authorizationViewModel.ShowSignInWindow();
+            _authorizationViewModel.OnSignedIn += OnAuthorize;
+            _authorizationViewModel.OnSignedUp += OnAuthorize;
             
             base.OnStartup(e);
         }
@@ -63,18 +60,17 @@ namespace MessengerClient
             CurrentUser = authorizedUser;
             _authorizationViewModel.HideAllWindows();
             
+            _chatViewModel = _host.Services.GetRequiredService<ChatViewModel>();
             _chatViewModel.ShowWindow();
         }
         
-        protected override void OnExit(ExitEventArgs e)
+        protected override async void OnExit(ExitEventArgs e)
         {
-            /*_host.StopAsync();
-            _host.Dispose();*/
-
-            _appClient.QuitAsync(() =>
-            {
-                _appClient.Dispose();
-            });
+            await _appClient.QuitAsync();
+            _appClient.Dispose();
+            
+            await _host.StopAsync().ConfigureAwait(false);
+            _host.Dispose();
             
             base.OnExit(e);
         }
