@@ -25,11 +25,13 @@ public class ChatUpdater
         _updateTimer = new Timer(UpdateChat, null, instantly ? TimeSpan.Zero : UpdatePeriod, UpdatePeriod);
     }
     
-    private void UpdateChat(object parameter)
+    private async void UpdateChat(object parameter)
     {
         Console.WriteLine("Time to update");
         
-        _appClient.GetMessagesAsync(_updateMethod);
+        List<Message> messages = await _appClient.GetMessagesAsync();
+        
+        _updateMethod?.Invoke(messages);
     }
     
     public async void Stop()

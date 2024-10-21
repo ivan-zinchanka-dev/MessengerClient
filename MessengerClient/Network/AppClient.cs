@@ -38,12 +38,11 @@ public class AppClient : IDisposable
         return IsConnected;
     }
 
-    public async void TrySignUpAsync(User user, Action<bool> onCompleteCallback)
+    public async Task<bool> TrySignUpAsync(User user)
     {
         if (!IsConnected)
         {
-            onCompleteCallback?.Invoke(IsConnected);
-            return;
+            return false;
         }
 
         NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
@@ -53,16 +52,14 @@ public class AppClient : IDisposable
         await networkAdaptor.SendQueryAsync(query);
         
         Response response = await networkAdaptor.ReceiveResponseAsync();
-        bool success = JsonSerializer.Deserialize<bool>(response.JsonDataString);
-        onCompleteCallback?.Invoke(success);
+        return JsonSerializer.Deserialize<bool>(response.JsonDataString);
     }
     
-    public async void TryLoginAsync(User user, Action<bool> onCompleteCallback)
+    public async Task<bool> TryLoginAsync(User user)
     {
         if (!IsConnected)
         {
-            onCompleteCallback?.Invoke(IsConnected);
-            return;
+            return false;
         }
         
         NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
@@ -72,16 +69,14 @@ public class AppClient : IDisposable
         await networkAdaptor.SendQueryAsync(query);
         
         Response response = await networkAdaptor.ReceiveResponseAsync();
-        bool success = JsonSerializer.Deserialize<bool>(response.JsonDataString);
-        onCompleteCallback?.Invoke(success);
+        return JsonSerializer.Deserialize<bool>(response.JsonDataString);
     }
 
-    public async void GetMessagesAsync(Action<List<Message>> onCompleteCallback)
+    public async Task<List<Message>> GetMessagesAsync()
     {
         if (!IsConnected)
         {
-            onCompleteCallback?.Invoke(new List<Message>());
-            return;
+            return new List<Message>();
         }
         
         NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
@@ -90,16 +85,14 @@ public class AppClient : IDisposable
         await networkAdaptor.SendQueryAsync(query);
         
         Response response = await networkAdaptor.ReceiveResponseAsync();
-        List<Message> messagesList = JsonSerializer.Deserialize<List<Message>>(response.JsonDataString);
-        onCompleteCallback?.Invoke(messagesList);
+        return JsonSerializer.Deserialize<List<Message>>(response.JsonDataString);
     }
     
-    public async void PostMessagesAsync(Message message, Action<bool> onCompleteCallback)
+    public async Task<bool> PostMessagesAsync(Message message)
     {
         if (!IsConnected)
         {
-            onCompleteCallback?.Invoke(IsConnected);
-            return;
+            return false;
         }
         
         NetworkAdaptor networkAdaptor = new NetworkAdaptor(_tcpClient.GetStream());
@@ -107,8 +100,7 @@ public class AppClient : IDisposable
         await networkAdaptor.SendQueryAsync(query);
         
         Response response = await networkAdaptor.ReceiveResponseAsync();
-        bool success = JsonSerializer.Deserialize<bool>(response.JsonDataString);
-        onCompleteCallback?.Invoke(success);
+        return JsonSerializer.Deserialize<bool>(response.JsonDataString);
     }
     
     public async Task QuitAsync()

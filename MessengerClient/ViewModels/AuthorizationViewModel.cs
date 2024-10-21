@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using MessengerClient.Commands;
 using MessengerClient.Core.Models;
@@ -199,9 +200,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged
     {
         if (TryGetValidatedUser(out User user))
         {
-            _appClient.TryLoginAsync(user, success =>
+            _appClient.TryLoginAsync(user).ContinueWith(task =>
             {
-                if (success)
+                if (task.Result)
                 {
                     ErrorMessage = string.Empty;
                     OnSignedIn?.Invoke(user);
@@ -210,7 +211,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged
                 {
                     ErrorMessage = _appClient.IsConnected ? "User not exist" : ConnectionErrorMessage;
                 }
-            });
+                
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
     }
 
@@ -218,9 +220,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged
     {
         if (TryGetValidatedUser(out User user))
         {
-            _appClient.TrySignUpAsync(user, success =>
+            _appClient.TrySignUpAsync(user).ContinueWith(task =>
             {
-                if (success)
+                if (task.Result)
                 {
                     ErrorMessage = string.Empty;
                     OnSignedUp?.Invoke(user);
@@ -229,7 +231,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged
                 {
                     ErrorMessage = _appClient.IsConnected ? "This nickname is already taken" : ConnectionErrorMessage;
                 }
-            });
+                
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
     }
     

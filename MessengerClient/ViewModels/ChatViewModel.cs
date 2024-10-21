@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using MessengerClient.Commands;
 using MessengerClient.Core.Models;
 using MessengerClient.Network;
@@ -79,12 +80,11 @@ public class ChatViewModel : INotifyPropertyChanged
                 
                 _messages.Add(message);
 
-                _appClient.PostMessagesAsync(message, success =>
+                _appClient.PostMessagesAsync(message).ContinueWith(result =>
                 {
                     MessageInputText = string.Empty;
                     //Console.WriteLine(success? "posted" : "not_posted");
-                });
-                
+                }, TaskScheduler.FromCurrentSynchronizationContext());
             });
         }
     }
