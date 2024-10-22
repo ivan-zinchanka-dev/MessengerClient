@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using MessengerClient.Commands;
 using MessengerClient.Core.Models;
-using MessengerClient.Network;
 using MessengerClient.Views;
 
 namespace MessengerClient.ViewModels;
@@ -24,16 +23,13 @@ public class AuthorizationViewModel : INotifyPropertyChanged
     private RelayCommand _signInCommand;
     private RelayCommand _signUpCommand;
     private RelayCommand _backCommand;
-    
-    private AppClient _appClient;
-    private Window _currentView;
 
-    private SignInWindow _signInWindow;
-    private SignUpWindow _signUpWindow;
+    private readonly App _appInstance;
+    private readonly SignInWindow _signInWindow;
+    private readonly SignUpWindow _signUpWindow;
+    private Window _currentView;
     
     public event PropertyChangedEventHandler PropertyChanged;
-    public event Action<User> OnSignedIn;
-    public event Action<User> OnSignedUp;
     
     public string Nickname
     {
@@ -92,13 +88,20 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         {
             return _signUpCommand ??= new RelayCommand(obj =>
             {
-                if (_currentView is SignInWindow && _appClient.IsConnected)
+                if (!_appInstance.IsClientConnected)
                 {
-                    SwitchToSignUpWindow();
+                    ErrorMessage = ConnectionErrorMessage;
                 }
-                else if (_currentView is SignUpWindow)
+                else
                 {
-                    SignUpIfPossible();
+                    if (_currentView is SignInWindow)
+                    {
+                        SwitchToSignUpWindow();
+                    }
+                    else if (_currentView is SignUpWindow)
+                    {
+                        SignUpIfPossible();
+                    }
                 }
             });
         }
@@ -115,10 +118,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         }
     }
     
-    public AuthorizationViewModel(AppClient appClient)
+    public AuthorizationViewModel(App appInstance)
     {
-        _appClient = appClient;
-        _appClient.ErrorCaptured += OnAppClientErrorCaptured;
+        _appInstance = appInstance;
         
         _signInWindow = new SignInWindow();
         _signInWindow.DataContext = this;
@@ -176,7 +178,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged
     {
         user = null;
         
-        if (!_appClient.IsConnected)
+        if (!_appInstance.IsClientConnected)
         {
             ErrorMessage = ConnectionErrorMessage;
             return false;
@@ -200,16 +202,15 @@ public class AuthorizationViewModel : INotifyPropertyChanged
     {
         if (TryGetValidatedUser(out User user))
         {
-            _appClient.TryLoginAsync(user).ContinueWith(task =>
+            _appInstance.TrySignInAsync(user).ContinueWith(task =>
             {
                 if (task.Result)
                 {
                     ErrorMessage = string.Empty;
-                    OnSignedIn?.Invoke(user);
                 }
                 else
                 {
-                    ErrorMessage = _appClient.IsConnected ? "User not exist" : ConnectionErrorMessage;
+                    ErrorMessage = _appInstance.IsClientConnected ? "User not exist" : ConnectionErrorMessage;
                 }
                 
             }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -217,19 +218,18 @@ public class AuthorizationViewModel : INotifyPropertyChanged
     }
 
     private void SignUpIfPossible()
-    {
+    { 
         if (TryGetValidatedUser(out User user))
         {
-            _appClient.TrySignUpAsync(user).ContinueWith(task =>
+            _appInstance.TrySignUpAsync(user).ContinueWith(task =>
             {
                 if (task.Result)
                 {
                     ErrorMessage = string.Empty;
-                    OnSignedUp?.Invoke(user);
                 }
                 else
                 {
-                    ErrorMessage = _appClient.IsConnected ? "This nickname is already taken" : ConnectionErrorMessage;
+                    ErrorMessage = _appInstance.IsClientConnected ? "This nickname is already taken" : ConnectionErrorMessage;
                 }
                 
             }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -250,14 +250,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         _signInWindow.Show();
     }
     
-    private void OnAppClientErrorCaptured()
+    private void OnWindowClosed(object sender, EventArgs e)
     {
-        ErrorMessage = ConnectionErrorMessage;
-    }
-
-    private static void OnWindowClosed(object sender, EventArgs e)
-    {
-        App.Instance.Shutdown();
+        _appInstance.Shutdown();
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

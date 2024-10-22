@@ -2,22 +2,28 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using MessengerClient.Core.Infrastructure;
 using MessengerClient.Core.Models;
+using Microsoft.Extensions.Hosting;
 
 namespace MessengerClient.Network;
 
-public class AppClient : IDisposable
+public class AppClient : BackgroundService, IDisposable
 {
     private TcpClient _tcpClient;
-
-    // TODO Reconnect logic
     
-    public event Action ErrorCaptured;
-
+    public ChatUpdater ChatUpdater { get; private set; }
     public bool IsConnected { get; private set; }
-
+    
+    public AppClient()
+    {
+        App.Instance.SetClient(this);
+        
+        ChatUpdater = new ChatUpdater(GetMessagesAsync);
+    }
+    
     public async Task<bool> TryConnectAsync()
     {
         try
@@ -32,7 +38,6 @@ public class AppClient : IDisposable
         catch (SocketException ex)
         {
             IsConnected = false;
-            ErrorCaptured?.Invoke();
         }
 
         return IsConnected;
@@ -55,7 +60,7 @@ public class AppClient : IDisposable
         return JsonSerializer.Deserialize<bool>(response.JsonDataString);
     }
     
-    public async Task<bool> TryLoginAsync(User user)
+    public async Task<bool> TrySignInAsync(User user)
     {
         if (!IsConnected)
         {
@@ -88,7 +93,7 @@ public class AppClient : IDisposable
         return JsonSerializer.Deserialize<List<Message>>(response.JsonDataString);
     }
     
-    public async Task<bool> PostMessagesAsync(Message message)
+    public async Task<bool> PostMessageAsync(Message message)
     {
         if (!IsConnected)
         {
@@ -119,5 +124,27 @@ public class AppClient : IDisposable
     public void Dispose()
     {
         _tcpClient?.Close();
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        Console.WriteLine("[Client] client exec");
+        
+        await TryConnectAsync();
+    }
+
+    public override async Task StartAsync(CancellationToken cancellationToken)
+    {
+        Console.WriteLine("[Client] client start");
+        
+        await TryConnectAsync();
+    }
+
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        Console.WriteLine("[Client] client stop");
+        
+        await QuitAsync();
+        Dispose();
     }
 }

@@ -6,7 +6,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using MessengerClient.Commands;
 using MessengerClient.Core.Models;
-using MessengerClient.Network;
 using MessengerClient.Views;
 
 namespace MessengerClient.ViewModels;
@@ -17,11 +16,9 @@ public class ChatViewModel : INotifyPropertyChanged
     private string _messageInputText;
     private bool _isSendMessageAllowed;
     private RelayCommand _sendMessageCommand;
-    
-    private AppClient _appClient;
-    private ChatUpdater _chatUpdater;
 
-    private ChatWindow _window;
+    private readonly App _appInstance;
+    private readonly ChatWindow _window;
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -80,30 +77,29 @@ public class ChatViewModel : INotifyPropertyChanged
                 
                 _messages.Add(message);
 
-                _appClient.PostMessagesAsync(message).ContinueWith(result =>
+                _appInstance.PostMessageAsync(message).ContinueWith(task =>
                 {
                     MessageInputText = string.Empty;
-                    //Console.WriteLine(success? "posted" : "not_posted");
+            
                 }, TaskScheduler.FromCurrentSynchronizationContext());
             });
         }
     }
     
-    public ChatViewModel(AppClient appClient)
+    public ChatViewModel(App appInstance)
     {
-        _appClient = appClient;
-        _chatUpdater = new ChatUpdater(appClient, UpdateMessagesList);
-
+        _appInstance = appInstance;
+        
         _window = new ChatWindow();
         _window.DataContext = this;
-        //_window.MessagesListViewSource = _messages;
     }
 
     public void ShowWindow()
     {
         _window.Show();
         _window.Closed += OnWindowClosedByUser;
-        _chatUpdater.Start(true);
+        _appInstance.ChatUpdater.Start();
+        _appInstance.ChatUpdater.OnUpdate += UpdateMessagesList;
     }
 
     private void UpdateMessagesList(List<Message> actualMessages)
@@ -111,14 +107,15 @@ public class ChatViewModel : INotifyPropertyChanged
         _window.Dispatcher.Invoke(() =>
         {
             Messages = new ObservableCollection<Message>(actualMessages);
-            //_window.MessagesListViewSource = _messages;
             Console.WriteLine("Updated");
         });
     }
 
-    private static void OnWindowClosedByUser(object sender, EventArgs e)
+    private void OnWindowClosedByUser(object sender, EventArgs e)
     {
-        App.Instance.Shutdown();
+        _appInstance.ChatUpdater.Stop();
+        _appInstance.ChatUpdater.OnUpdate -= UpdateMessagesList;
+        _appInstance.Shutdown();
     }
     
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

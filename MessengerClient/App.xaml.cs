@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using MessengerClient.Core.Models;
 using MessengerClient.Network;
@@ -20,6 +21,14 @@ namespace MessengerClient
         private ChatViewModel _chatViewModel;
 
         public User CurrentUser { get; private set; }
+        public bool IsClientConnected => _appClient.IsConnected;
+        public ChatUpdater ChatUpdater => _appClient.ChatUpdater;
+
+        public void SetClient(AppClient appClient)      // TODO refactor (events?, shared service?)
+        {
+            _appClient = appClient;
+            Console.WriteLine("Set client");
+        }
 
         public App()
         {
@@ -29,47 +38,67 @@ namespace MessengerClient
                 .ConfigureServices(services =>
                 {
                     services
-                        .AddSingleton<AppClient>()
+                        .AddSingleton<App>(this)
+                        .AddHostedService<AppClient>()
                         .AddSingleton<AuthorizationViewModel>()
                         .AddSingleton<ChatViewModel>();
                     
                 })
                 .Build();
         }
-        
-        protected override async void OnStartup(StartupEventArgs e)
+
+        public async Task<bool> TrySignInAsync(User user)
         {
-            await _host.StartAsync().ConfigureAwait(false);
+            bool result = await _appClient.TrySignInAsync(user);
 
-            _appClient = _host.Services.GetRequiredService<AppClient>();
+            if (result)
+            {
+                Authorize(user);
+            }
 
-            bool isConnected = await _appClient.TryConnectAsync();
-
-            _authorizationViewModel = _host.Services
-                .GetRequiredService<AuthorizationViewModel>();
+            return result;
+        }
+        
+        public async Task<bool> TrySignUpAsync(User user)
+        {
+            bool result = await _appClient.TrySignUpAsync(user);
             
-            _authorizationViewModel.ShowSignInWindow();
-            _authorizationViewModel.OnSignedIn += OnAuthorize;
-            _authorizationViewModel.OnSignedUp += OnAuthorize;
-            
-            base.OnStartup(e);
+            if (result)
+            {
+                Authorize(user);
+            }
+
+            return result;
         }
 
-        private void OnAuthorize(User authorizedUser)
+        public async Task<bool> PostMessageAsync(Message message) => await _appClient.PostMessageAsync(message);
+        
+        private void Authorize(User authorizedUser)
         {
             CurrentUser = authorizedUser;
             _authorizationViewModel.HideAllWindows();
             
             _chatViewModel = _host.Services.GetRequiredService<ChatViewModel>();
             _chatViewModel.ShowWindow();
+        } 
+            
+        protected override async void OnStartup(StartupEventArgs e)
+        {
+            await _host.StartAsync();
+            
+            Console.WriteLine("After set client");
+            
+            _authorizationViewModel = _host.Services
+                .GetRequiredService<AuthorizationViewModel>();
+            
+            _authorizationViewModel.ShowSignInWindow();
+            
+            base.OnStartup(e);
         }
         
         protected override async void OnExit(ExitEventArgs e)
         {
-            await _appClient.QuitAsync();
-            _appClient.Dispose();
-            
-            await _host.StopAsync().ConfigureAwait(false);
+            await _host.StopAsync();
             _host.Dispose();
             
             base.OnExit(e);
