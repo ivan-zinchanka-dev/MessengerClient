@@ -146,6 +146,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged
 
     private bool Validate()
     {
+        // TODO Use data annotations or validation rules
+        
         if (string.IsNullOrEmpty(Nickname))
         {
             ErrorMessage = "Nickname should not be empty";

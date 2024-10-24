@@ -27,8 +27,6 @@ public class ChatUpdater
     
     private async void UpdateChat(object parameter)
     {
-        Console.WriteLine("Time to update");
-        
         List<Message> messages = await _getMessagesMethod.Invoke();
         OnUpdate?.Invoke(messages);
     }
@@ -37,5 +35,4 @@ public class ChatUpdater
     {
         await _updateTimer.DisposeAsync();
     }
-    
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using MessengerClient.Core.Infrastructure;
 using MessengerClient.Core.Models;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace MessengerClient.Network;
 
@@ -14,15 +15,18 @@ public class AppClient : BackgroundService
 {
     private readonly AppSharedOptions _sharedOptions;
     private readonly TcpClient _tcpClient;
+    private readonly ILogger<AppClient> _logger;
     
     public ChatUpdater ChatUpdater { get; private set; }
     public bool IsConnected { get; private set; }
     
-    public AppClient(AppSharedOptions sharedOptions)
+    public AppClient(AppSharedOptions sharedOptions, ILogger<AppClient> logger)
     {
         _sharedOptions = sharedOptions;
-        ChatUpdater = new ChatUpdater(GetMessagesAsync);
+        _logger = logger;
         _tcpClient = new TcpClient();
+        ChatUpdater = new ChatUpdater(GetMessagesAsync);
+        
         _sharedOptions.AppClient = this;
     }
     
@@ -30,9 +34,9 @@ public class AppClient : BackgroundService
     {
         try
         {
+            _logger.LogInformation("Connecting to server...");
             await _tcpClient.ConnectAsync(_sharedOptions.RemoteEndPoint);
-            Console.WriteLine("Connected to server");
-
+            _logger.LogInformation("Client is connected to server.");
             IsConnected = true;
         }
         catch (SocketException ex)
@@ -47,6 +51,7 @@ public class AppClient : BackgroundService
     {
         if (!IsConnected)
         {
+            _logger.LogWarning("Attempt to sign up while server is disconnected");
             return false;
         }
 
@@ -64,6 +69,7 @@ public class AppClient : BackgroundService
     {
         if (!IsConnected)
         {
+            _logger.LogWarning("Attempt to sign in while server is disconnected");
             return false;
         }
         
@@ -81,6 +87,7 @@ public class AppClient : BackgroundService
     {
         if (!IsConnected)
         {
+            _logger.LogWarning("Attempt to get messages while server is disconnected");
             return new List<Message>();
         }
         
@@ -97,6 +104,7 @@ public class AppClient : BackgroundService
     {
         if (!IsConnected)
         {
+            _logger.LogWarning("Attempt to post a message while server is disconnected");
             return false;
         }
         
@@ -112,6 +120,7 @@ public class AppClient : BackgroundService
     {
         if (!IsConnected)
         {
+            _logger.LogWarning("Attempt to quit while server is disconnected");
             return;
         }
         
@@ -119,11 +128,17 @@ public class AppClient : BackgroundService
 
         Query query = new Query(QueryHeader.Quit);
         await networkAdaptor.SendQueryAsync(query);
+
+        IsConnected = false;
     }
     
     public override void Dispose()
     {
+        IsConnected = false;
         _tcpClient?.Close();
+        
+        _logger.LogInformation("Client is shut down.");
+        
         base.Dispose();
     }
     

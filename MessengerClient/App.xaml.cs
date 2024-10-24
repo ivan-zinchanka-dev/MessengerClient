@@ -6,6 +6,7 @@ using MessengerClient.Network;
 using MessengerClient.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace MessengerClient
 {
@@ -30,6 +31,11 @@ namespace MessengerClient
             };
             
             _host = Host.CreateDefaultBuilder()
+                .ConfigureLogging(loggingBuilder =>
+                {
+                    loggingBuilder.AddConsole();
+                    loggingBuilder.SetMinimumLevel(LogLevel.Information);
+                })
                 .ConfigureServices(services =>
                 {
                     services
@@ -38,8 +44,8 @@ namespace MessengerClient
                         .AddHostedService<AppClient>()
                         .AddSingleton<AuthorizationViewModel>()
                         .AddSingleton<ChatViewModel>();
-                    
                 })
+                
                 .Build();
         }
 
