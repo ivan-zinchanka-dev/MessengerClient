@@ -25,11 +25,13 @@ namespace MessengerClient
         
         public App()
         {
+            // TODO To .ini file
             _sharedOptions = new AppSharedOptions()
             {
                 RemoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8888)
             };
             
+            // TODO To logs file
             _host = Host.CreateDefaultBuilder()
                 .ConfigureLogging(loggingBuilder =>
                 {
@@ -45,7 +47,6 @@ namespace MessengerClient
                         .AddSingleton<AuthorizationViewModel>()
                         .AddSingleton<ChatViewModel>();
                 })
-                
                 .Build();
         }
 
