@@ -11,6 +11,12 @@
         ResizeMode="NoResize"
         Background="#bae7ff">
     
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding SendMessageCommand}" 
+                    Key="Enter" 
+                    Modifiers="Control" />
+    </Window.InputBindings>
+    
     <Window.Resources>
         <converters:TextAlignmentByNickname x:Key="TextAlignmentByNickname"/>
         <converters:HorizontalAlignmentByNickname x:Key="HorizontalAlignmentByNickname"/>

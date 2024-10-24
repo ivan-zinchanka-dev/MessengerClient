@@ -56,8 +56,6 @@ public class ChatViewModel : INotifyPropertyChanged
 
     public RelayCommand SendMessageCommand
     {
-        //  TODO ADD HOTKEY
-        
         get
         {
             return _sendMessageCommand ??= new RelayCommand(obj =>
