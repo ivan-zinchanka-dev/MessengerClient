@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using MessengerClient.Core.Models;
@@ -17,27 +18,28 @@ namespace MessengerClient
         private readonly IHost _host;
         
         private AppClient _appClient;
+        private readonly AppSharedOptions _sharedOptions;
         private AuthorizationViewModel _authorizationViewModel;
         private ChatViewModel _chatViewModel;
 
         public User CurrentUser { get; private set; }
         public bool IsClientConnected => _appClient.IsConnected;
         public ChatUpdater ChatUpdater => _appClient.ChatUpdater;
-
-        public void SetClient(AppClient appClient)      // TODO refactor (events?, shared service?)
-        {
-            _appClient = appClient;
-            Console.WriteLine("Set client");
-        }
-
+        
         public App()
         {
+            _sharedOptions = new AppSharedOptions()
+            {
+                RemoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8888)
+            };
+            
             Instance = this;
             
             _host = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services
+                        .AddSingleton<AppSharedOptions>(_sharedOptions)
                         .AddSingleton<App>(this)
                         .AddHostedService<AppClient>()
                         .AddSingleton<AuthorizationViewModel>()
@@ -85,8 +87,7 @@ namespace MessengerClient
         protected override async void OnStartup(StartupEventArgs e)
         {
             await _host.StartAsync();
-            
-            Console.WriteLine("After set client");
+            _appClient = _sharedOptions.AppClient;
             
             _authorizationViewModel = _host.Services
                 .GetRequiredService<AuthorizationViewModel>();

@@ -12,16 +12,17 @@ namespace MessengerClient.Network;
 
 public class AppClient : BackgroundService, IDisposable
 {
+    private AppSharedOptions _sharedOptions;
     private TcpClient _tcpClient;
     
     public ChatUpdater ChatUpdater { get; private set; }
     public bool IsConnected { get; private set; }
     
-    public AppClient()
+    public AppClient(AppSharedOptions sharedOptions)
     {
-        App.Instance.SetClient(this);
-        
+        _sharedOptions = sharedOptions;
         ChatUpdater = new ChatUpdater(GetMessagesAsync);
+        _sharedOptions.AppClient = this;
     }
     
     public async Task<bool> TryConnectAsync()
@@ -29,7 +30,7 @@ public class AppClient : BackgroundService, IDisposable
         try
         {
             _tcpClient = new TcpClient();
-            await _tcpClient.ConnectAsync("127.0.0.1", 8888);
+            await _tcpClient.ConnectAsync(_sharedOptions.RemoteEndPoint);
             
             Console.WriteLine("Connected to server");
 
