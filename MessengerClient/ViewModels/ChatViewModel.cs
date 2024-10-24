@@ -69,7 +69,7 @@ public class ChatViewModel : INotifyPropertyChanged
 
                 Message message = new Message()
                 {
-                    SenderNickname = App.Instance.CurrentUser.Nickname,
+                    SenderNickname = _appInstance.CurrentUser.Nickname,
                     ReceiverNickname = null,
                     Text = _messageInputText,
                     PostDateTime = DateTime.UtcNow
@@ -107,7 +107,6 @@ public class ChatViewModel : INotifyPropertyChanged
         _window.Dispatcher.Invoke(() =>
         {
             Messages = new ObservableCollection<Message>(actualMessages);
-            Console.WriteLine("Updated");
         });
     }
 

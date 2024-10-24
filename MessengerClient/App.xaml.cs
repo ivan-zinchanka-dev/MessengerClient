@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using MessengerClient.Core.Models;
@@ -8,13 +7,10 @@ using MessengerClient.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-
 namespace MessengerClient
 {
     public partial class App : Application
     {
-        public static App Instance { get; private set; }
-
         private readonly IHost _host;
         
         private AppClient _appClient;
@@ -32,8 +28,6 @@ namespace MessengerClient
             {
                 RemoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8888)
             };
-            
-            Instance = this;
             
             _host = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>

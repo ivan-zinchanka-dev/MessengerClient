@@ -10,10 +10,10 @@ using Microsoft.Extensions.Hosting;
 
 namespace MessengerClient.Network;
 
-public class AppClient : BackgroundService, IDisposable
+public class AppClient : BackgroundService
 {
-    private AppSharedOptions _sharedOptions;
-    private TcpClient _tcpClient;
+    private readonly AppSharedOptions _sharedOptions;
+    private readonly TcpClient _tcpClient;
     
     public ChatUpdater ChatUpdater { get; private set; }
     public bool IsConnected { get; private set; }
@@ -22,6 +22,7 @@ public class AppClient : BackgroundService, IDisposable
     {
         _sharedOptions = sharedOptions;
         ChatUpdater = new ChatUpdater(GetMessagesAsync);
+        _tcpClient = new TcpClient();
         _sharedOptions.AppClient = this;
     }
     
@@ -29,9 +30,7 @@ public class AppClient : BackgroundService, IDisposable
     {
         try
         {
-            _tcpClient = new TcpClient();
             await _tcpClient.ConnectAsync(_sharedOptions.RemoteEndPoint);
-            
             Console.WriteLine("Connected to server");
 
             IsConnected = true;
@@ -122,30 +121,25 @@ public class AppClient : BackgroundService, IDisposable
         await networkAdaptor.SendQueryAsync(query);
     }
     
-    public void Dispose()
+    public override void Dispose()
     {
         _tcpClient?.Close();
+        base.Dispose();
     }
-
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        Console.WriteLine("[Client] client exec");
-        
-        await TryConnectAsync();
-    }
-
+    
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine("[Client] client start");
-        
         await TryConnectAsync();
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine("[Client] client stop");
-        
         await QuitAsync();
         Dispose();
+    }
+    
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await TryConnectAsync();
     }
 }

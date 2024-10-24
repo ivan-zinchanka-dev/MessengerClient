@@ -5,13 +5,15 @@ using System.Windows.Data;
 
 namespace MessengerClient.Converters;
 
-public class NicknameToTextAlignment : IValueConverter
+public class TextAlignmentByNickname : IValueConverter
 {
+    private readonly App _appInstance = Application.Current as App;
+    
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is string nickname)
         {
-            return nickname == App.Instance.CurrentUser.Nickname ? TextAlignment.Right : TextAlignment.Left;
+            return nickname == _appInstance.CurrentUser.Nickname ? TextAlignment.Right : TextAlignment.Left;
         }
         else
         {
@@ -23,11 +25,11 @@ public class NicknameToTextAlignment : IValueConverter
     {
         if (value is TextAlignment textAlignment && textAlignment == TextAlignment.Right)
         {
-            return App.Instance.CurrentUser.Nickname;
+            return _appInstance.CurrentUser.Nickname;
         }
         else
         {
-            throw new Exception();
+            throw new InvalidOperationException("Getting name of another user is not supported");
         }
     }
 }
