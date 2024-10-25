@@ -1,7 +1,10 @@
-﻿using System.Net;
+﻿using System;
+using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using MessengerClient.Core.Models;
+using MessengerClient.Core.Services;
 using MessengerClient.Network;
 using MessengerClient.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +15,7 @@ namespace MessengerClient
 {
     public partial class App : Application
     {
+        private const string AppConfigFileName = "app_config.ini";
         private readonly IHost _host;
         
         private AppClient _appClient;
@@ -25,13 +29,8 @@ namespace MessengerClient
         
         public App()
         {
-            // TODO To .ini file
-            _sharedOptions = new AppSharedOptions()
-            {
-                RemoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8888)
-            };
+            _sharedOptions = new AppSharedOptions(GetRemoteEndPoint());
             
-            // TODO To logs file
             _host = Host.CreateDefaultBuilder()
                 .ConfigureLogging(loggingBuilder =>
                 {
@@ -76,15 +75,6 @@ namespace MessengerClient
 
         public async Task<bool> PostMessageAsync(Message message) => await _appClient.PostMessageAsync(message);
         
-        private void Authorize(User authorizedUser)
-        {
-            CurrentUser = authorizedUser;
-            _authorizationViewModel.HideAllWindows();
-            
-            _chatViewModel = _host.Services.GetRequiredService<ChatViewModel>();
-            _chatViewModel.ShowWindow();
-        } 
-            
         protected override async void OnStartup(StartupEventArgs e)
         {
             await _host.StartAsync();
@@ -104,6 +94,32 @@ namespace MessengerClient
             _host.Dispose();
             
             base.OnExit(e);
+        }
+        
+        private void Authorize(User authorizedUser)
+        {
+            CurrentUser = authorizedUser;
+            _authorizationViewModel.HideAllWindows();
+            
+            _chatViewModel = _host.Services.GetRequiredService<ChatViewModel>();
+            _chatViewModel.ShowWindow();
+        } 
+        
+        private IPEndPoint GetRemoteEndPoint()
+        {
+            string appConfigPath = Path.Combine(Directory.GetCurrentDirectory(), AppConfigFileName);
+            
+            IniService iniService = new IniService(appConfigPath);
+
+            string addressString = iniService.GetString(
+                nameof(_sharedOptions.RemoteEndPoint),
+                nameof(_sharedOptions.RemoteEndPoint.Address));
+            
+            string portString = iniService.GetString(
+                nameof(_sharedOptions.RemoteEndPoint),
+                nameof(_sharedOptions.RemoteEndPoint.Port));
+            
+            return new IPEndPoint(IPAddress.Parse(addressString), Convert.ToInt32(portString));
         }
     }
 }
