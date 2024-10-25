@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -6,11 +7,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using MessengerClient.Commands;
 using MessengerClient.Core.Models;
+using MessengerClient.Validation;
 using MessengerClient.Views;
 
 namespace MessengerClient.ViewModels;
 
-public class AuthorizationViewModel : INotifyPropertyChanged
+public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 {
     private const string PasswordRegexPattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$";
     private const string ConnectionErrorMessage = "Connection error";
@@ -28,8 +30,11 @@ public class AuthorizationViewModel : INotifyPropertyChanged
     private readonly SignInWindow _signInWindow;
     private readonly SignUpWindow _signUpWindow;
     private Window _currentView;
+
+    private readonly ValidationErrorCollection _errorCollection = new ValidationErrorCollection();
     
     public event PropertyChangedEventHandler PropertyChanged;
+    public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
     
     public string Nickname
     {
@@ -38,6 +43,16 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         {
             _nickname = value;
             OnPropertyChanged();
+
+            ValidateProperty(propertyName =>
+            {
+                if (string.IsNullOrEmpty(Nickname))
+                {
+                    return _errorCollection.TryAddError(propertyName, "Nickname should not be empty");
+                }
+
+                return false;
+            });
         }
     }
 
@@ -48,6 +63,20 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         {
             _password = value;
             OnPropertyChanged();
+            
+            ValidateProperty(propertyName =>
+            {
+                Regex regex = new Regex(PasswordRegexPattern);
+            
+                if (!regex.IsMatch(Password))
+                {
+                    return _errorCollection.TryAddError(propertyName,
+                        "Password should has at least 8 characters and contains " +
+                        "numbers, uppercase and lowercase latin letters");
+                }
+                
+                return false;
+            });
         }
     }
     
@@ -58,10 +87,20 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         {
             _passwordConfirm = value;
             OnPropertyChanged();
+            
+            ValidateProperty(propertyName =>
+            {
+                if (Password != PasswordConfirm)
+                {
+                    return _errorCollection.TryAddError(propertyName, "Passwords mismatch");
+                }
+                
+                return false;
+            });
         }
     }
     
-    public string ErrorMessage
+    public string ErrorMessage      // TODO ValidationSummary 
     {
         get => _errorMessage;
         set
@@ -144,37 +183,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged
         _signUpWindow.Hide();
     }
 
-    private bool Validate()
-    {
-        // TODO Use data annotations or validation rules
-        
-        if (string.IsNullOrEmpty(Nickname))
-        {
-            ErrorMessage = "Nickname should not be empty";
-            return false;
-        }
-
-        if (_currentView is SignUpWindow)
-        {
-            Regex regex = new Regex(PasswordRegexPattern);
-            
-            if (!regex.IsMatch(Password))
-            {
-                ErrorMessage = "Password should has at least 8 characters " +
-                               "and contains numbers, uppercase and lowercase latin letters";
-                return false;
-            }
-            
-            if (Password != PasswordConfirm)
-            {
-                ErrorMessage = "Passwords mismatch";
-                return false;
-            }
-        }
-        
-        ErrorMessage = string.Empty;
-        return true;
-    }
+    
     
     private bool TryGetValidatedUser(out User user)
     {
@@ -186,10 +195,15 @@ public class AuthorizationViewModel : INotifyPropertyChanged
             return false;
         }
 
-        if (!Validate())
+        if (_errorCollection.HasErrors)
         {
             return false;
         }
+
+        /*if (!Validate())
+        {
+            return false;
+        }*/
         
         user = new User()
         {
@@ -261,4 +275,88 @@ public class AuthorizationViewModel : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+    
+    private void OnErrorsChanged(string propertyName)
+    {
+        ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+    }
+    
+
+    private void ValidateProperty(Func<string, bool> validation = null, [CallerMemberName] string propertyName = null)
+    {
+        if (_errorCollection.TryClearErrors(propertyName)){
+            
+           OnErrorsChanged(propertyName); 
+        }
+
+        if (validation?.Invoke(propertyName) == true)
+        {
+            OnErrorsChanged(propertyName);
+        }
+        
+        UpdateErrorMessage();
+    }
+
+    private void UpdateErrorMessage()
+    {
+        // TODO foreach
+
+        string errorMessage = string.Join('\n',
+            string.Join('\n', _errorCollection.GetErrors(nameof(Nickname))),
+            string.Join('\n', _errorCollection.GetErrors(nameof(Password))),
+            string.Join('\n', _errorCollection.GetErrors(nameof(PasswordConfirm))));
+
+        ErrorMessage = errorMessage;
+    }
+
+    private bool Validate()
+    {
+        // TODO Use data annotations or validation rules
+        
+        if (string.IsNullOrEmpty(Nickname))
+        {
+            ErrorMessage = "Nickname should not be empty";
+            return false;
+        }
+
+        if (_currentView is SignUpWindow)
+        {
+            Regex regex = new Regex(PasswordRegexPattern);
+            
+            if (!regex.IsMatch(Password))
+            {
+                ErrorMessage = "Password should has at least 8 characters " +
+                               "and contains numbers, uppercase and lowercase latin letters";
+                return false;
+            }
+            
+            if (Password != PasswordConfirm)
+            {
+                ErrorMessage = "Passwords mismatch";
+                return false;
+            }
+        }
+        
+        ErrorMessage = string.Empty;
+        return true;
+    }
+    
+    /*private void UpdateValidationSummary()
+    {
+        var errors = new List<string>();
+
+        // Collect errors for each property
+        foreach (var propertyName in new[] { nameof(Name), nameof(Age) })
+        {
+            var error = this[propertyName];
+            if (!string.IsNullOrEmpty(error))
+                errors.Add(error);
+        }
+
+        // Combine errors into a single string
+        ValidationSummary = string.Join(Environment.NewLine, errors);
+    }*/
+    public IEnumerable GetErrors(string propertyName) => _errorCollection.GetErrors(propertyName);
+    public bool HasErrors => _errorCollection.HasErrors;
+    
 }

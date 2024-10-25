@@ -18,8 +18,8 @@ namespace MessengerClient
         private const string AppConfigFileName = "app_config.ini";
         private readonly IHost _host;
         
-        private AppClient _appClient;
         private readonly AppSharedOptions _sharedOptions;
+        private AppClient _appClient;
         private AuthorizationViewModel _authorizationViewModel;
         private ChatViewModel _chatViewModel;
 

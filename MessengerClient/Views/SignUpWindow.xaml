@@ -14,7 +14,7 @@
             
             <TextBox Margin="0 0 0 0" Width="200"
                      FontSize="14"
-                     Text="{Binding Nickname, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding Nickname, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                      Style="{StaticResource HintTextBox}">
                 <TextBox.Resources>
                     <VisualBrush x:Key="HintBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
@@ -29,7 +29,7 @@
             
             <TextBox Margin="0 10 0 0" Width="200"
                      FontSize="14"
-                     Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding Password, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                      Style="{StaticResource HintTextBox}">
                 
                 <TextBox.Resources>
@@ -45,7 +45,7 @@
             
             <TextBox Margin="0 10 0 0" Width="200"
                      FontSize="14"
-                     Text="{Binding PasswordConfirm, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding PasswordConfirm, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                      Style="{StaticResource HintTextBox}">
                 
                 <TextBox.Resources>
