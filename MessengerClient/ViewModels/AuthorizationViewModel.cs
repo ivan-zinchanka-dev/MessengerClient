@@ -19,8 +19,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     private const string PasswordRegexPattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$";
     private const string ConnectionErrorMessage = "Connection error";
     
-    private string _nickname = "Jan Zinch";           // "Jan Zinch"
-    private string _password = "1111aBll";           // "1111aBll"
+    private string _nickname;
+    private string _password;
     private string _passwordConfirm;
     private string _errorMessage;
     
@@ -173,9 +173,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
             return false;
         }
 
-        ValidateViewModel();
-        
-        if (_errorCollection.HasErrors)
+        if (!ValidateViewModel())
         {
             return false;
         }
@@ -201,7 +199,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
                 }
                 else
                 {
-                    ErrorMessage = _appInstance.IsClientConnected ? "User not exist" : ConnectionErrorMessage;
+                    ErrorMessage = _appInstance.IsClientConnected ? "This user not exist or password is wrong" : 
+                        ConnectionErrorMessage;
                 }
                 
             }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -230,6 +229,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     private void SwitchToSignUpWindow()
     {
         _signInWindow.Hide();
+        
+        UpdateErrorMessage();
+        
         _currentView = _signUpWindow;
         _signUpWindow.Show();
     }
@@ -237,6 +239,10 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     private void SwitchToSignInWindow()
     {
         _signUpWindow.Hide();
+        
+        _errorCollection.ClearAllErrors();
+        UpdateErrorMessage();
+        
         _currentView = _signInWindow;
         _signInWindow.Show();
     }
@@ -255,7 +261,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
                 "Nickname should not be empty"),
             
             new PropertyValidationStep(nameof(Password), 
-                () => !new Regex(PasswordRegexPattern).IsMatch(Password), 
+                () => Password == null || !new Regex(PasswordRegexPattern).IsMatch(Password), 
                 "Password should has at least 8 characters and contains numbers, " +
                 "uppercase and lowercase latin letters"),
             
@@ -265,12 +271,19 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         };
     }
 
-    private void ValidateViewModel()
+    private bool ValidateViewModel()
     {
+        if (_currentView is SignInWindow)
+        {
+            return true;
+        }
+
         foreach (PropertyValidationStep validationStep in _validationSteps)
         {
             ValidateProperty(validationStep);
         }
+
+        return !_errorCollection.HasErrors;
     }
 
     private void ValidateProperty([CallerMemberName] string propertyName = null)

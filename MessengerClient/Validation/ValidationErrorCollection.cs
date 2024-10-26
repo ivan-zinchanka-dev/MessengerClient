@@ -47,4 +47,9 @@ public class ValidationErrorCollection
 
         return false;
     }
+
+    public void ClearAllErrors()
+    {
+        _errors.Clear();
+    }
 }
