@@ -18,16 +18,15 @@ namespace MessengerClient
     public partial class App : Application
     {
         private const string AppConfigFileName = "app_config.ini";
-        private const string AppLogsFileName = "app.logs";
         
         private readonly IHost _host;
-        
         private readonly AppSharedOptions _sharedOptions;
+        private readonly IniService _iniService;
+        private readonly ILogger<App> _logger;
+        
         private AppClient _appClient;
         private AuthorizationViewModel _authorizationViewModel;
         private ChatViewModel _chatViewModel;
-
-        private readonly ILogger<App> _logger;
         
         public User CurrentUser { get; private set; }
         public bool IsClientConnected => _appClient.IsConnected;
@@ -37,6 +36,9 @@ namespace MessengerClient
         
         public App()
         {
+            string appConfigPath = Path.Combine(Directory.GetCurrentDirectory(), AppConfigFileName);
+            _iniService = new IniService(appConfigPath);
+            
             _sharedOptions = new AppSharedOptions(GetRemoteEndPoint());
             
             _host = Host.CreateDefaultBuilder()
@@ -44,7 +46,7 @@ namespace MessengerClient
                 {
                     loggingBuilder
                         .AddConsole()
-                        .AddFile(Path.Combine(Directory.GetCurrentDirectory(), AppLogsFileName))
+                        .AddFile(GetLogsFileName())
                         .SetMinimumLevel(LogLevel.Information);
                 })
                 .ConfigureServices(services =>
@@ -59,7 +61,6 @@ namespace MessengerClient
                 .Build();
 
             _logger = _host.Services.GetRequiredService<ILogger<App>>();
-
         }
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -119,7 +120,6 @@ namespace MessengerClient
                 .GetRequiredService<AuthorizationViewModel>();
             
             _authorizationViewModel.ShowSignInWindow();
-            
         }
         
         protected override async void OnExit(ExitEventArgs e)
@@ -141,18 +141,19 @@ namespace MessengerClient
             _chatViewModel = _host.Services.GetRequiredService<ChatViewModel>();
             _chatViewModel.ShowWindow();
         }
-        
+
+        private string GetLogsFileName()
+        {
+            return _iniService.GetString("Logging", "LogsFileName");
+        }
+
         private IPEndPoint GetRemoteEndPoint()
         {
-            string appConfigPath = Path.Combine(Directory.GetCurrentDirectory(), AppConfigFileName);
-            
-            IniService iniService = new IniService(appConfigPath);
-
-            string addressString = iniService.GetString(
+            string addressString = _iniService.GetString(
                 nameof(_sharedOptions.RemoteEndPoint),
                 nameof(_sharedOptions.RemoteEndPoint.Address));
             
-            string portString = iniService.GetString(
+            string portString = _iniService.GetString(
                 nameof(_sharedOptions.RemoteEndPoint),
                 nameof(_sharedOptions.RemoteEndPoint.Port));
             
