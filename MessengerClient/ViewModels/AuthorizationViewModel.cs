@@ -34,9 +34,10 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     private Window _currentView;
 
     private readonly ValidationErrorCollection _errorCollection = new ValidationErrorCollection();
-
-    private List<PropertyValidationStep> _validationSteps;
+    private List<PropertyValidationStep> _validationSteps = new List<PropertyValidationStep>();
     
+    private static readonly string[] ValidatablePropertyChain = new[] 
+        { nameof(Nickname), nameof(Password), nameof(PasswordConfirm) };
     public event PropertyChangedEventHandler PropertyChanged;
     public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
     
@@ -159,6 +160,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         _signUpWindow.Hide();
     }
     
+    public bool HasErrors => _errorCollection.HasErrors;
+    public IEnumerable GetErrors(string propertyName) => _errorCollection.GetErrors(propertyName);
+    
     private bool TryGetValidatedUser(out User user)
     {
         user = null;
@@ -241,16 +245,6 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     {
         _appInstance.Shutdown();
     }
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-    
-    private void OnErrorsChanged(string propertyName)
-    {
-        ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
-    }
     
     private void InitializeValidationSteps()
     {
@@ -309,24 +303,20 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     
     private void UpdateErrorMessage()
     {
-        if (_errorCollection.GetErrors(nameof(Nickname)).Any())
-        {
-            ErrorMessage = string.Join('\n', _errorCollection.GetErrors(nameof(Nickname)));
-        }
-        else if (_errorCollection.GetErrors(nameof(Password)).Any())
-        {
-            ErrorMessage = string.Join('\n', _errorCollection.GetErrors(nameof(Password)));
-        }
-        else if (_errorCollection.GetErrors(nameof(PasswordConfirm)).Any())
-        {
-            ErrorMessage = string.Join('\n', _errorCollection.GetErrors(nameof(PasswordConfirm)));
-        }
-        else
-        {
-            ErrorMessage = string.Empty;
-        }
+        IEnumerable<string> errors = ValidatablePropertyChain
+            .Select(property => _errorCollection.GetErrors(property))
+            .FirstOrDefault(errors => errors.Any());
+        
+        ErrorMessage = errors != null ? string.Join('\n', errors) : string.Empty;
     }
     
-    public IEnumerable GetErrors(string propertyName) => _errorCollection.GetErrors(propertyName);
-    public bool HasErrors => _errorCollection.HasErrors;
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    
+    private void OnErrorsChanged(string propertyName)
+    {
+        ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+    }
 }
