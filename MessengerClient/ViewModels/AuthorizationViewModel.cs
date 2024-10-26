@@ -261,12 +261,13 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
                 "Nickname should not be empty"),
             
             new PropertyValidationStep(nameof(Password), 
-                () => Password == null || !new Regex(PasswordRegexPattern).IsMatch(Password), 
-                "Password should has at least 8 characters and contains numbers, " +
-                "uppercase and lowercase latin letters"),
+                () => _currentView is SignUpWindow && 
+                      (Password == null || !new Regex(PasswordRegexPattern).IsMatch(Password)), 
+                "Password should has at least 8 characters and contains numbers," +
+                " uppercase and lowercase latin letters"),
             
             new PropertyValidationStep(nameof(PasswordConfirm), 
-                () => Password != PasswordConfirm, 
+                () => _currentView is SignUpWindow && Password != PasswordConfirm, 
                 "Passwords mismatch"),
         };
     }

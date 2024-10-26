@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using MessengerClient.Core.Models;
 using MessengerClient.Core.Services;
 using MessengerClient.Network;
@@ -29,6 +30,9 @@ namespace MessengerClient
         
         public App()
         {
+            AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
+            DispatcherUnhandledException += OnDispatcherUnhandledException;
+            
             _sharedOptions = new AppSharedOptions(GetRemoteEndPoint());
             
             _host = Host.CreateDefaultBuilder()
@@ -47,6 +51,16 @@ namespace MessengerClient
                         .AddSingleton<ChatViewModel>();
                 })
                 .Build();
+        }
+
+        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+       
+        }
+
+        private void OnAppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            
         }
 
         public async Task<bool> TrySignInAsync(User user)
