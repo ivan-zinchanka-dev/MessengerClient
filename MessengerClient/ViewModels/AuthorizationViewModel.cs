@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -46,6 +47,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         {
             _nickname = value;
             OnPropertyChanged();
+            ValidateProperty();
         }
     }
     
@@ -56,6 +58,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         {
             _password = value;
             OnPropertyChanged();
+            ValidateProperty();
         }
     }
     
@@ -66,10 +69,11 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         {
             _passwordConfirm = value;
             OnPropertyChanged();
+            ValidateProperty();
         }
     }
     
-    public string ErrorMessage      // TODO ValidationSummary 
+    public string ErrorMessage
     {
         get => _errorMessage;
         set
@@ -165,7 +169,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
             return false;
         }
 
-        ValidateAndUpdateViewModel();
+        ValidateViewModel();
         
         if (_errorCollection.HasErrors)
         {
@@ -267,11 +271,21 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         };
     }
 
-    private void ValidateAndUpdateViewModel()
+    private void ValidateViewModel()
     {
         foreach (PropertyValidationStep validationStep in _validationSteps)
         {
             ValidateProperty(validationStep);
+        }
+    }
+
+    private void ValidateProperty([CallerMemberName] string propertyName = null)
+    {
+        int foundIndex = _validationSteps.FindIndex(step => step.PropertyName == propertyName);
+
+        if (foundIndex != -1)
+        {
+            ValidateProperty(_validationSteps[foundIndex]);
         }
         
         UpdateErrorMessage();
@@ -289,18 +303,28 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         {
             OnErrorsChanged(validationStep.PropertyName);
         }
+        
+        UpdateErrorMessage();
     }
     
     private void UpdateErrorMessage()
     {
-        // TODO foreach
-
-        string errorMessage = string.Join('\n',
-            string.Join('\n', _errorCollection.GetErrors(nameof(Nickname))),
-            string.Join('\n', _errorCollection.GetErrors(nameof(Password))),
-            string.Join('\n', _errorCollection.GetErrors(nameof(PasswordConfirm))));
-
-        ErrorMessage = errorMessage;
+        if (_errorCollection.GetErrors(nameof(Nickname)).Any())
+        {
+            ErrorMessage = string.Join('\n', _errorCollection.GetErrors(nameof(Nickname)));
+        }
+        else if (_errorCollection.GetErrors(nameof(Password)).Any())
+        {
+            ErrorMessage = string.Join('\n', _errorCollection.GetErrors(nameof(Password)));
+        }
+        else if (_errorCollection.GetErrors(nameof(PasswordConfirm)).Any())
+        {
+            ErrorMessage = string.Join('\n', _errorCollection.GetErrors(nameof(PasswordConfirm)));
+        }
+        else
+        {
+            ErrorMessage = string.Empty;
+        }
     }
     
     public IEnumerable GetErrors(string propertyName) => _errorCollection.GetErrors(propertyName);
