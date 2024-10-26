@@ -102,6 +102,8 @@ public class ChatViewModel : INotifyPropertyChanged
 
     private void UpdateMessagesList(List<Message> actualMessages)
     {
+        // TODO Scroll to bottom
+        
         _window.Dispatcher.Invoke(() =>
         {
             Messages = new ObservableCollection<Message>(actualMessages);

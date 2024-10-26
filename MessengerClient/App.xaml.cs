@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Threading;
 using MessengerClient.Core.Models;
 using MessengerClient.Core.Services;
+using MessengerClient.Core.Services.FileLogging;
 using MessengerClient.Network;
 using MessengerClient.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,8 @@ namespace MessengerClient
     public partial class App : Application
     {
         private const string AppConfigFileName = "app_config.ini";
+        private const string AppLogsFileName = "app.logs";
+        
         private readonly IHost _host;
         
         private readonly AppSharedOptions _sharedOptions;
@@ -24,22 +27,25 @@ namespace MessengerClient
         private AuthorizationViewModel _authorizationViewModel;
         private ChatViewModel _chatViewModel;
 
+        private readonly ILogger<App> _logger;
+        
         public User CurrentUser { get; private set; }
         public bool IsClientConnected => _appClient.IsConnected;
         public ChatUpdater ChatUpdater => _appClient.ChatUpdater;
         
+        // TODO Add dll for Core
+        
         public App()
         {
-            AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
-            DispatcherUnhandledException += OnDispatcherUnhandledException;
-            
             _sharedOptions = new AppSharedOptions(GetRemoteEndPoint());
             
             _host = Host.CreateDefaultBuilder()
                 .ConfigureLogging(loggingBuilder =>
                 {
-                    loggingBuilder.AddConsole();
-                    loggingBuilder.SetMinimumLevel(LogLevel.Information);
+                    loggingBuilder
+                        .AddConsole()
+                        .AddFile(Path.Combine(Directory.GetCurrentDirectory(), AppLogsFileName))
+                        .SetMinimumLevel(LogLevel.Information);
                 })
                 .ConfigureServices(services =>
                 {
@@ -51,16 +57,26 @@ namespace MessengerClient
                         .AddSingleton<ChatViewModel>();
                 })
                 .Build();
+
+            _logger = _host.Services.GetRequiredService<ILogger<App>>();
+
         }
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-       
+            _logger.LogError( e.Exception, "Unhandled exception occured");
         }
 
         private void OnAppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            
+            if (e.ExceptionObject is Exception exception)
+            {
+                _logger.LogError(exception, "Unhandled exception occured"); 
+            }
+            else
+            {
+                _logger.LogError(e.ExceptionObject.ToString());
+            }
         }
 
         public async Task<bool> TrySignInAsync(User user)
@@ -91,6 +107,11 @@ namespace MessengerClient
         
         protected override async void OnStartup(StartupEventArgs e)
         {
+            base.OnStartup(e);
+            
+            AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
+            DispatcherUnhandledException += OnDispatcherUnhandledException;
+            
             await _host.StartAsync();
             _appClient = _sharedOptions.AppClient;
             
@@ -99,13 +120,15 @@ namespace MessengerClient
             
             _authorizationViewModel.ShowSignInWindow();
             
-            base.OnStartup(e);
         }
         
         protected override async void OnExit(ExitEventArgs e)
         {
             await _host.StopAsync();
             _host.Dispose();
+            
+            AppDomain.CurrentDomain.UnhandledException -= OnAppDomainUnhandledException;
+            DispatcherUnhandledException -= OnDispatcherUnhandledException;
             
             base.OnExit(e);
         }
@@ -117,7 +140,7 @@ namespace MessengerClient
             
             _chatViewModel = _host.Services.GetRequiredService<ChatViewModel>();
             _chatViewModel.ShowWindow();
-        } 
+        }
         
         private IPEndPoint GetRemoteEndPoint()
         {
