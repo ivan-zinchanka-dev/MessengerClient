@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -32,6 +33,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     private Window _currentView;
 
     private readonly ValidationErrorCollection _errorCollection = new ValidationErrorCollection();
+
+    private List<PropertyValidationStep> _validationSteps;
     
     public event PropertyChangedEventHandler PropertyChanged;
     public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
@@ -43,19 +46,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         {
             _nickname = value;
             OnPropertyChanged();
-
-            ValidateProperty(propertyName =>
-            {
-                if (string.IsNullOrEmpty(Nickname))
-                {
-                    return _errorCollection.TryAddError(propertyName, "Nickname should not be empty");
-                }
-
-                return false;
-            });
         }
     }
-
+    
     public string Password
     {
         get => _password;
@@ -63,20 +56,6 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         {
             _password = value;
             OnPropertyChanged();
-            
-            ValidateProperty(propertyName =>
-            {
-                Regex regex = new Regex(PasswordRegexPattern);
-            
-                if (!regex.IsMatch(Password))
-                {
-                    return _errorCollection.TryAddError(propertyName,
-                        "Password should has at least 8 characters and contains " +
-                        "numbers, uppercase and lowercase latin letters");
-                }
-                
-                return false;
-            });
         }
     }
     
@@ -87,16 +66,6 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         {
             _passwordConfirm = value;
             OnPropertyChanged();
-            
-            ValidateProperty(propertyName =>
-            {
-                if (Password != PasswordConfirm)
-                {
-                    return _errorCollection.TryAddError(propertyName, "Passwords mismatch");
-                }
-                
-                return false;
-            });
         }
     }
     
@@ -109,7 +78,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
             OnPropertyChanged();
         }
     }
-    
+
     public RelayCommand SignInCommand
     {
         get
@@ -163,15 +132,18 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         
         _signInWindow = new SignInWindow();
         _signInWindow.DataContext = this;
-        _currentView = _signInWindow;
         
         _signUpWindow = new SignUpWindow();
         _signUpWindow.DataContext = this;
         
         _signInWindow.Closed += OnWindowClosed;
         _signUpWindow.Closed += OnWindowClosed;
-    }
 
+        _currentView = _signInWindow;
+        
+        InitializeValidationSteps();
+    }
+    
     public void ShowSignInWindow()
     {
         _signInWindow.Show();
@@ -182,8 +154,6 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         _signInWindow.Hide();
         _signUpWindow.Hide();
     }
-
-    
     
     private bool TryGetValidatedUser(out User user)
     {
@@ -195,15 +165,12 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
             return false;
         }
 
+        ValidateAndUpdateViewModel();
+        
         if (_errorCollection.HasErrors)
         {
             return false;
         }
-
-        /*if (!Validate())
-        {
-            return false;
-        }*/
         
         user = new User()
         {
@@ -281,22 +248,49 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
     }
     
-
-    private void ValidateProperty(Func<string, bool> validation = null, [CallerMemberName] string propertyName = null)
+    private void InitializeValidationSteps()
     {
-        if (_errorCollection.TryClearErrors(propertyName)){
-            
-           OnErrorsChanged(propertyName); 
-        }
-
-        if (validation?.Invoke(propertyName) == true)
+        _validationSteps = new List<PropertyValidationStep>()
         {
-            OnErrorsChanged(propertyName);
+            new PropertyValidationStep(nameof(Nickname), 
+                () => string.IsNullOrEmpty(Nickname) || string.IsNullOrWhiteSpace(Nickname), 
+                "Nickname should not be empty"),
+            
+            new PropertyValidationStep(nameof(Password), 
+                () => !new Regex(PasswordRegexPattern).IsMatch(Password), 
+                "Password should has at least 8 characters and contains numbers, " +
+                "uppercase and lowercase latin letters"),
+            
+            new PropertyValidationStep(nameof(PasswordConfirm), 
+                () => Password != PasswordConfirm, 
+                "Passwords mismatch"),
+        };
+    }
+
+    private void ValidateAndUpdateViewModel()
+    {
+        foreach (PropertyValidationStep validationStep in _validationSteps)
+        {
+            ValidateProperty(validationStep);
         }
         
         UpdateErrorMessage();
     }
 
+    private void ValidateProperty(PropertyValidationStep validationStep)
+    {
+        if (_errorCollection.TryClearErrors(validationStep.PropertyName)){
+            
+            OnErrorsChanged(validationStep.PropertyName); 
+        }
+
+        if (validationStep.ErrorCondition() && 
+            _errorCollection.TryAddError(validationStep.PropertyName, validationStep.ErrorMessage))
+        {
+            OnErrorsChanged(validationStep.PropertyName);
+        }
+    }
+    
     private void UpdateErrorMessage()
     {
         // TODO foreach
@@ -308,55 +302,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
 
         ErrorMessage = errorMessage;
     }
-
-    private bool Validate()
-    {
-        // TODO Use data annotations or validation rules
-        
-        if (string.IsNullOrEmpty(Nickname))
-        {
-            ErrorMessage = "Nickname should not be empty";
-            return false;
-        }
-
-        if (_currentView is SignUpWindow)
-        {
-            Regex regex = new Regex(PasswordRegexPattern);
-            
-            if (!regex.IsMatch(Password))
-            {
-                ErrorMessage = "Password should has at least 8 characters " +
-                               "and contains numbers, uppercase and lowercase latin letters";
-                return false;
-            }
-            
-            if (Password != PasswordConfirm)
-            {
-                ErrorMessage = "Passwords mismatch";
-                return false;
-            }
-        }
-        
-        ErrorMessage = string.Empty;
-        return true;
-    }
     
-    /*private void UpdateValidationSummary()
-    {
-        var errors = new List<string>();
-
-        // Collect errors for each property
-        foreach (var propertyName in new[] { nameof(Name), nameof(Age) })
-        {
-            var error = this[propertyName];
-            if (!string.IsNullOrEmpty(error))
-                errors.Add(error);
-        }
-
-        // Combine errors into a single string
-        ValidationSummary = string.Join(Environment.NewLine, errors);
-    }*/
     public IEnumerable GetErrors(string propertyName) => _errorCollection.GetErrors(propertyName);
     public bool HasErrors => _errorCollection.HasErrors;
-    
 }
