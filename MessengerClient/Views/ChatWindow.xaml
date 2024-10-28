@@ -29,7 +29,8 @@
             <RowDefinition Height="0.05*"/>
         </Grid.RowDefinitions>
         
-        <ListView Grid.Row="0" ItemsSource="{Binding Path= Messages}" ScrollViewer.CanContentScroll="False">
+        <ListView x:Name="_messagesListView" x:FieldModifier="private" 
+                  Grid.Row="0" ItemsSource="{Binding Path= Messages}" ScrollViewer.CanContentScroll="False">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Width="410">

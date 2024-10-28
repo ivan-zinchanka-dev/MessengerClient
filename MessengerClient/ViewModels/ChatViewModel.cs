@@ -19,6 +19,7 @@ public class ChatViewModel : INotifyPropertyChanged
 
     private readonly App _appInstance;
     private readonly ChatWindow _window;
+    private bool _messagesUpdatedOnce;
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -102,11 +103,15 @@ public class ChatViewModel : INotifyPropertyChanged
 
     private void UpdateMessagesList(List<Message> actualMessages)
     {
-        // TODO Scroll to bottom
-        
         _window.Dispatcher.Invoke(() =>
         {
             Messages = new ObservableCollection<Message>(actualMessages);
+
+            if (!_messagesUpdatedOnce)
+            {
+                _window.ScrollMessagesListToEnd();
+                _messagesUpdatedOnce = true;
+            }
         });
     }
 
