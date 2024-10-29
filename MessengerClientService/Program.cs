@@ -1,25 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ServiceProcess;
 
 namespace MessengerClientService
 {
-    internal static class Program
+    public static class Program
     {
-        /// <summary>
-        /// Главная точка входа для приложения.
-        /// </summary>
-        static void Main()
+        private static void Main()
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
-            {
-                new MessengerService()
-            };
-            ServiceBase.Run(ServicesToRun);
+            ServiceBase.Run(new ServiceBase[] { new MessengerService() });
         }
     }
 }
