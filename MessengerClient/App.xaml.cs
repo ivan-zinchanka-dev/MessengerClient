@@ -45,7 +45,7 @@ namespace MessengerClient
                 .ConfigureLogging(loggingBuilder =>
                 {
                     loggingBuilder
-                        .AddConsole()
+                        .AddDebug()
                         .AddFile(GetLogsFileName())
                         .SetMinimumLevel(LogLevel.Information);
                 })
