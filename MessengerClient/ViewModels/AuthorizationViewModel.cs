@@ -8,9 +8,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using MessengerClient.Commands;
-using MessengerClient.Core.Models;
 using MessengerClient.Validation;
 using MessengerClient.Views;
+using MessengerCoreLibrary.Models;
 
 namespace MessengerClient.ViewModels;
 
@@ -19,8 +19,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     private const string PasswordRegexPattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$";
     private const string ConnectionErrorMessage = "Connection error";
     
-    private string _nickname;
-    private string _password;
+    private string _nickname = "Jan Zinch";
+    private string _password = "1111aBll";
     private string _passwordConfirm;
     private string _errorMessage;
     

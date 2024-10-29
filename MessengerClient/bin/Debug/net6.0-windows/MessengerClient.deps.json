@@ -8,7 +8,8 @@
     ".NETCoreApp,Version=v6.0": {
       "MessengerClient/1.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.Hosting": "8.0.0-rc.2.23479.6"
+          "Microsoft.Extensions.Hosting": "8.0.0-rc.2.23479.6",
+          "MessengerCoreLibrary": "1.0.0.0"
         },
         "runtime": {
           "MessengerClient.dll": {}
@@ -446,6 +447,14 @@
             "fileVersion": "8.0.23.47906"
           }
         }
+      },
+      "MessengerCoreLibrary/1.0.0.0": {
+        "runtime": {
+          "MessengerCoreLibrary.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -678,6 +687,11 @@
       "sha512": "sha512-SXMjrmm/e0Om+731AEUgm+81dC+i9mV54nKJGOq9+zTYpzujMCmSQSMS1sgQb0gmiiAfTfRC5WgD3l92cfAP+g==",
       "path": "system.text.json/8.0.0-rc.2.23479.6",
       "hashPath": "system.text.json.8.0.0-rc.2.23479.6.nupkg.sha512"
+    },
+    "MessengerCoreLibrary/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

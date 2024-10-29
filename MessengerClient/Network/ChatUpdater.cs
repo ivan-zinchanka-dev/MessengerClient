@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using MessengerClient.Core.Models;
+using MessengerCoreLibrary.Models;
 
 namespace MessengerClient.Network;
 

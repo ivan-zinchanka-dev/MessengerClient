@@ -5,8 +5,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using MessengerClient.Commands;
-using MessengerClient.Core.Models;
 using MessengerClient.Views;
+using MessengerCoreLibrary.Models;
 
 namespace MessengerClient.ViewModels;
 

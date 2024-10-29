@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using MessengerClient.Core.Infrastructure;
-using MessengerClient.Core.Models;
+using MessengerCoreLibrary.Infrastructure;
+using MessengerCoreLibrary.Models;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

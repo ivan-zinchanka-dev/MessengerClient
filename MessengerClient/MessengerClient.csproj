@@ -18,4 +18,10 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="MessengerCoreLibrary">
+        <HintPath>..\ExternalLibs\MessengerCoreLibrary.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

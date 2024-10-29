@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using MessengerClient.Core.Infrastructure;
+using MessengerCoreLibrary.Infrastructure;
 
 namespace MessengerClient.Network;
 
