@@ -178,11 +178,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
             return false;
         }
         
-        user = new User()
-        {
-            Nickname = Nickname,
-            Password = Password
-        };
+        user = new User(Nickname, Password);
 
         return true;
     }

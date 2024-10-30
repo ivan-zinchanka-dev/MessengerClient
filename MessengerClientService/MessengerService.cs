@@ -17,36 +17,44 @@ namespace MessengerClientService
 {
     public partial class MessengerService : ServiceBase
     {
-        private static string AppDataPath => Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-        private const string AppFolderName = "MessengerService";
-        private const string LogsFileName = "MessengerLogs.txt";
-        
-        private readonly IPEndPoint _remotePoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5555);
-        private UdpClient _udpClient;
-        
-        private static readonly TimeSpan UpdatePeriod = TimeSpan.FromSeconds(1.0f);
-        private Timer _updateTimer;
+        private const string AppFolderName = "MessengerClientService";
+        private const string LogsFileName = "app_service.logs";
         
         private static readonly IEqualityComparer<Message> MessageEqualityComparer = new MessageEqualityComparer();
-        private IEnumerable<Message> _cachedMessages;
+        private static readonly TimeSpan UpdatePeriod = TimeSpan.FromSeconds(1.0f);
         
+        private readonly IPEndPoint _remoteEndPoint;
         private readonly ILogger _logger;
         
-        public MessengerService()
+        private UdpClient _udpClient;
+        private Timer _updateTimer;
+        private IEnumerable<Message> _cachedMessages;
+        
+        private static string AppDataPath => Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+        
+        public MessengerService(IPEndPoint remoteEndPoint)
         {
+            _remoteEndPoint = remoteEndPoint;
+            
             string pathToLogs = Path.Combine(AppDataPath, AppFolderName, LogsFileName);
             
             _logger = new FileLogger(pathToLogs, nameof(MessengerService));
+            
+            _logger.LogInformation("Trying to construct");
             
             InitializeComponent();
 
             CanStop = true;
             CanPauseAndContinue = true;
             AutoLog = true;
+            
+            _logger.LogInformation("Constructed");
         }
         
         protected override void OnStart(string[] args)
         {
+            _logger.LogInformation("Trying to start");
+            
             _udpClient = new UdpClient();
             _updateTimer = new Timer(Update, null, UpdatePeriod, UpdatePeriod);
             
@@ -61,6 +69,8 @@ namespace MessengerClientService
 
         protected override void OnContinue()
         {
+            _logger.LogInformation("Trying to continue");
+            
             _updateTimer = new Timer(Update, null, UpdatePeriod, UpdatePeriod);
             
             _logger.LogInformation("Service continued");
@@ -84,7 +94,7 @@ namespace MessengerClientService
             Query query = new Query(QueryHeader.UpdateChat);
             byte[] binaryQuery = Encoding.UTF8.GetBytes(query.ToString());
 
-            await _udpClient.SendAsync(binaryQuery, binaryQuery.Length, _remotePoint);
+            await _udpClient.SendAsync(binaryQuery, binaryQuery.Length, _remoteEndPoint);
             
             UdpReceiveResult rawResult = await _udpClient.ReceiveAsync();
             Response response = Response.FromRawLine(Encoding.UTF8.GetString(rawResult.Buffer));

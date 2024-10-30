@@ -66,13 +66,8 @@ public class ChatViewModel : INotifyPropertyChanged
                     return;
                 }
 
-                Message message = new Message()
-                {
-                    SenderNickname = _appInstance.CurrentUser.Nickname,
-                    ReceiverNickname = null,
-                    Text = _messageInputText,
-                    PostDateTime = DateTime.UtcNow
-                };
+                Message message = new Message(_appInstance.CurrentUser.Nickname, null, 
+                    _messageInputText, DateTime.UtcNow);
                 
                 _messages.Add(message);
 
