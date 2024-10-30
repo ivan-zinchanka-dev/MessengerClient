@@ -21,6 +21,7 @@ namespace MessengerClientService
         private const string AppFolderName = "MessengerClientService";
         private const string LogsFileName = "app_service.logs";
         private const string ConfigFileName = "config.ini";
+        private const int ConfigurationErrorCode = 2;
         
         private static readonly IEqualityComparer<Message> MessageEqualityComparer = new MessageEqualityComparer();
         private static readonly TimeSpan UpdatePeriod = TimeSpan.FromSeconds(1.0f);
@@ -37,48 +38,47 @@ namespace MessengerClientService
         
         public MessengerService()
         {
-            _logger = new FileLogger(
-                Path.Combine(AppDataPath, AppFolderName, LogsFileName), nameof(MessengerService));
-            
-            _iniService = new IniService(Path.Combine(AppDataPath, AppFolderName, ConfigFileName));
-            
-            _remoteEndPoint = GetRemoteEndPoint();
-            
-            _logger.LogInformation("Trying to construct");
-            _logger.LogInformation("Current directory: " + Directory.GetCurrentDirectory());
-            
             InitializeComponent();
 
             CanStop = true;
             CanPauseAndContinue = true;
             AutoLog = true;
             
-            _logger.LogInformation("Constructed");
+            _logger = new FileLogger(Path.Combine(AppDataPath, AppFolderName, LogsFileName), 
+                nameof(MessengerService));
+            _iniService = new IniService(Path.Combine(AppDataPath, AppFolderName, ConfigFileName));
+
+            try
+            {
+                _remoteEndPoint = GetRemoteEndPoint();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical("Config file not found or corrupted");
+                Environment.Exit(ConfigurationErrorCode);
+            }
+            
+            _logger.LogInformation("The service has been created");
         }
         
         protected override void OnStart(string[] args)
         {
-            _logger.LogInformation("Trying to start");
-            
             _udpClient = new UdpClient();
             _updateTimer = new Timer(Update, null, UpdatePeriod, UpdatePeriod);
             
-            _logger.LogInformation("Service started");
+            _logger.LogInformation("The service has started");
         }
         
         protected override void OnPause()
         {
             _updateTimer?.Dispose();
-            _logger.LogInformation("Service paused");
+            _logger.LogInformation("The service has paused");
         }
 
         protected override void OnContinue()
         {
-            _logger.LogInformation("Trying to continue");
-            
             _updateTimer = new Timer(Update, null, UpdatePeriod, UpdatePeriod);
-            
-            _logger.LogInformation("Service continued");
+            _logger.LogInformation("The service has continued");
         }
 
         protected override void OnStop()
@@ -95,8 +95,6 @@ namespace MessengerClientService
             string portString = _iniService.GetString("RemoteEndPoint", "Port");
 
             return new IPEndPoint(IPAddress.Parse(addressString), Convert.ToInt32(portString));
-
-            /*return new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5555);*/
         }
         
         private void Update(object parameter)
