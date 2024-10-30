@@ -19,8 +19,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     private const string PasswordRegexPattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$";
     private const string ConnectionErrorMessage = "A connection error occurred.";
     
-    private string _nickname = "Jan Zinch";     // TODO Remove
-    private string _password = "1111aBll";
+    private string _nickname;
+    private string _password;
     private string _passwordConfirm;
     private string _errorMessage;
     
