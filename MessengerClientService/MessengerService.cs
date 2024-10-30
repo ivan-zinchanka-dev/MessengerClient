@@ -128,8 +128,8 @@ namespace MessengerClientService
                 
                 foreach (Message message in newMessages)
                 {
-                    _logger.LogInformation("\n{0}\n{1}\n{2}\n", 
-                        message.SenderNickname, message.Text, message.PostDateTime);
+                    _logger.LogInformation("User \"{}\" sent a message: {}", 
+                        message.SenderNickname, message.Text);
                 }
 
                 _cachedMessages = actualMessages;
