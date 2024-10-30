@@ -35,7 +35,7 @@ public class AppClient : BackgroundService
         {
             _logger.LogInformation("Connecting to server...");
             await _tcpClient.ConnectAsync(_sharedOptions.RemoteEndPoint);
-            _logger.LogInformation("Client is connected to server.");
+            _logger.LogInformation("The client is connected to the server.");
             IsConnected = true;
         }
         catch (SocketException ex)
@@ -50,7 +50,7 @@ public class AppClient : BackgroundService
     {
         if (!IsConnected)
         {
-            _logger.LogWarning("Attempt to sign up while server is disconnected");
+            _logger.LogWarning("Attempt to sign up when the server is disconnected.");
             return false;
         }
 
@@ -68,7 +68,7 @@ public class AppClient : BackgroundService
     {
         if (!IsConnected)
         {
-            _logger.LogWarning("Attempt to sign in while server is disconnected");
+            _logger.LogWarning("Attempt to sign in when the server is disconnected.");
             return false;
         }
         
@@ -86,7 +86,7 @@ public class AppClient : BackgroundService
     {
         if (!IsConnected)
         {
-            _logger.LogWarning("Attempt to get messages while server is disconnected");
+            _logger.LogWarning("Attempt to get messages when the server is disconnected.");
             return new List<Message>();
         }
         
@@ -103,7 +103,7 @@ public class AppClient : BackgroundService
     {
         if (!IsConnected)
         {
-            _logger.LogWarning("Attempt to post a message while server is disconnected");
+            _logger.LogWarning("Attempt to post a message when the server is disconnected.");
             return false;
         }
         
@@ -119,7 +119,7 @@ public class AppClient : BackgroundService
     {
         if (!IsConnected)
         {
-            _logger.LogWarning("Attempt to quit while server is disconnected");
+            _logger.LogWarning("Attempt to quit when the server is disconnected.");
             return;
         }
         
@@ -136,7 +136,7 @@ public class AppClient : BackgroundService
         IsConnected = false;
         _tcpClient?.Close();
         
-        _logger.LogInformation("Client is shut down.");
+        _logger.LogInformation("The client is shut down.");
         
         base.Dispose();
     }

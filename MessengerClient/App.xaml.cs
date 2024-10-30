@@ -63,14 +63,14 @@ namespace MessengerClient
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            _logger.LogError( e.Exception, "Unhandled exception occured");
+            _logger.LogError( e.Exception, "An unhandled exception occurred.");
         }
 
         private void OnAppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             if (e.ExceptionObject is Exception exception)
             {
-                _logger.LogError(exception, "Unhandled exception occured"); 
+                _logger.LogError(exception, "An unhandled exception occurred."); 
             }
             else
             {

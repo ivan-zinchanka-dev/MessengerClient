@@ -17,7 +17,7 @@ public class HorizontalAlignmentByNickname : IValueConverter
         }
         else
         {
-            throw new InvalidOperationException("Value must be a System.String");
+            throw new InvalidOperationException("The value must be of type System.String.");
         }
     }
 
@@ -29,7 +29,7 @@ public class HorizontalAlignmentByNickname : IValueConverter
         }
         else
         {
-            throw new InvalidOperationException("Getting name of another user is not supported");
+            throw new InvalidOperationException("Getting another user's name is not supported.");
         }
     }
 }

@@ -17,9 +17,9 @@ namespace MessengerClient.ViewModels;
 public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 {
     private const string PasswordRegexPattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$";
-    private const string ConnectionErrorMessage = "Connection error";
+    private const string ConnectionErrorMessage = "A connection error occurred.";
     
-    private string _nickname = "Jan Zinch";
+    private string _nickname = "Jan Zinch";     // TODO Remove
     private string _password = "1111aBll";
     private string _passwordConfirm;
     private string _errorMessage;
@@ -195,7 +195,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
                 }
                 else
                 {
-                    ErrorMessage = _appInstance.IsClientConnected ? "This user not exist or password is wrong" : 
+                    ErrorMessage = _appInstance.IsClientConnected ? 
+                        "This user does not exist or the password is incorrect." : 
                         ConnectionErrorMessage;
                 }
                 
@@ -215,7 +216,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
                 }
                 else
                 {
-                    ErrorMessage = _appInstance.IsClientConnected ? "This nickname is already taken" : ConnectionErrorMessage;
+                    ErrorMessage = _appInstance.IsClientConnected ? 
+                        "This nickname is already taken." : 
+                        ConnectionErrorMessage;
                 }
                 
             }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -254,17 +257,17 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         {
             new PropertyValidationStep(nameof(Nickname), 
                 () => string.IsNullOrEmpty(Nickname) || string.IsNullOrWhiteSpace(Nickname), 
-                "Nickname should not be empty"),
+                "The nickname must not be empty."),
             
             new PropertyValidationStep(nameof(Password), 
                 () => _currentView is SignUpWindow && 
                       (Password == null || !new Regex(PasswordRegexPattern).IsMatch(Password)), 
-                "Password should has at least 8 characters and contains numbers," +
-                " uppercase and lowercase latin letters"),
+                "The password must be at least 8 characters long and contain numbers, " +
+                "uppercase and lowercase Latin letters."),
             
             new PropertyValidationStep(nameof(PasswordConfirm), 
                 () => _currentView is SignUpWindow && Password != PasswordConfirm, 
-                "Passwords mismatch"),
+                "Passwords do not match."),
         };
     }
 

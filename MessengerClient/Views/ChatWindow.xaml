@@ -62,7 +62,7 @@
                 <VisualBrush x:Key="HintBrush" AlignmentX="Left" AlignmentY="Top" Stretch="None">
                     <VisualBrush.Visual>
                         <Border Width="500" Height="150">
-                            <Label Content="Write message..." Foreground="Gray" Background="White" />
+                            <Label Content="Write a message..." Foreground="Gray" Background="White" />
                         </Border>
                     </VisualBrush.Visual>
                 </VisualBrush> 
