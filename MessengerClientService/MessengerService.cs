@@ -54,11 +54,11 @@ namespace MessengerClientService
             }
             catch (Exception ex)
             {
-                _logger.LogCritical("Config file not found or corrupted");
+                _logger.LogCritical("Config file not found or corrupted.");
                 Environment.Exit(ConfigurationErrorCode);
             }
             
-            _logger.LogInformation("The service has been created");
+            _logger.LogInformation("The service has been created.");
         }
         
         protected override void OnStart(string[] args)
@@ -66,19 +66,19 @@ namespace MessengerClientService
             _udpClient = new UdpClient();
             _updateTimer = new Timer(Update, null, UpdatePeriod, UpdatePeriod);
             
-            _logger.LogInformation("The service has started");
+            _logger.LogInformation("The service has been started.");
         }
         
         protected override void OnPause()
         {
             _updateTimer?.Dispose();
-            _logger.LogInformation("The service has paused");
+            _logger.LogInformation("The service has been paused.");
         }
 
         protected override void OnContinue()
         {
             _updateTimer = new Timer(Update, null, UpdatePeriod, UpdatePeriod);
-            _logger.LogInformation("The service has continued");
+            _logger.LogInformation("The service has been continued.");
         }
 
         protected override void OnStop()
@@ -86,7 +86,7 @@ namespace MessengerClientService
             _updateTimer?.Dispose();
             _udpClient?.Close();
             
-            _logger.LogInformation("Service stopped");
+            _logger.LogInformation("The service has been stopped.");
         }
         
         private IPEndPoint GetRemoteEndPoint()
@@ -128,7 +128,7 @@ namespace MessengerClientService
                 
                 foreach (Message message in newMessages)
                 {
-                    _logger.LogInformation("User \"{}\" sent a message: {}", 
+                    _logger.LogInformation("User \"{}\" sent a message: {}.", 
                         message.SenderNickname, message.Text);
                 }
 
