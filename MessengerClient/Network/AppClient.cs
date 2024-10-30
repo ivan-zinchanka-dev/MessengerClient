@@ -38,7 +38,7 @@ public class AppClient : BackgroundService
             _logger.LogInformation("The client is connected to the server.");
             IsConnected = true;
         }
-        catch (SocketException ex)
+        catch (SocketException)
         {
             IsConnected = false;
         }

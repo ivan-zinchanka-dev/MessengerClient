@@ -52,7 +52,7 @@ namespace MessengerClientService
             {
                 _remoteEndPoint = GetRemoteEndPoint();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _logger.LogCritical("Config file not found or corrupted.");
                 Environment.Exit(ConfigurationErrorCode);

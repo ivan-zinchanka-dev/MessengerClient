@@ -20,7 +20,7 @@ public class ChatUpdater
         _getMessagesMethod = getMessagesMethod;
     }
     
-    public async void Start(bool instantly = true)
+    public void Start(bool instantly = true)
     {
         _updateTimer = new Timer(UpdateChat, null, instantly ? TimeSpan.Zero : UpdatePeriod, UpdatePeriod);
     }
