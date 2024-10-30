@@ -32,8 +32,6 @@ namespace MessengerClient
         public bool IsClientConnected => _appClient.IsConnected;
         public ChatUpdater ChatUpdater => _appClient.ChatUpdater;
         
-        // TODO Add dll for Core
-        
         public App()
         {
             string appConfigPath = Path.Combine(Directory.GetCurrentDirectory(), AppConfigFileName);

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using MessengerCoreLibrary.Infrastructure;
 using MessengerCoreLibrary.Models;
+using MessengerCoreLibrary.Services;
 using MessengerCoreLibrary.Services.FileLogging;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -19,12 +20,14 @@ namespace MessengerClientService
     {
         private const string AppFolderName = "MessengerClientService";
         private const string LogsFileName = "app_service.logs";
+        private const string ConfigFileName = "config.ini";
         
         private static readonly IEqualityComparer<Message> MessageEqualityComparer = new MessageEqualityComparer();
         private static readonly TimeSpan UpdatePeriod = TimeSpan.FromSeconds(1.0f);
         
-        private readonly IPEndPoint _remoteEndPoint;
         private readonly ILogger _logger;
+        private readonly IniService _iniService;
+        private readonly IPEndPoint _remoteEndPoint;
         
         private UdpClient _udpClient;
         private Timer _updateTimer;
@@ -32,15 +35,17 @@ namespace MessengerClientService
         
         private static string AppDataPath => Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
         
-        public MessengerService(IPEndPoint remoteEndPoint)
+        public MessengerService()
         {
-            _remoteEndPoint = remoteEndPoint;
+            _logger = new FileLogger(
+                Path.Combine(AppDataPath, AppFolderName, LogsFileName), nameof(MessengerService));
             
-            string pathToLogs = Path.Combine(AppDataPath, AppFolderName, LogsFileName);
+            _iniService = new IniService(Path.Combine(AppDataPath, AppFolderName, ConfigFileName));
             
-            _logger = new FileLogger(pathToLogs, nameof(MessengerService));
+            _remoteEndPoint = GetRemoteEndPoint();
             
             _logger.LogInformation("Trying to construct");
+            _logger.LogInformation("Current directory: " + Directory.GetCurrentDirectory());
             
             InitializeComponent();
 
@@ -82,6 +87,16 @@ namespace MessengerClientService
             _udpClient?.Close();
             
             _logger.LogInformation("Service stopped");
+        }
+        
+        private IPEndPoint GetRemoteEndPoint()
+        {
+            string addressString = _iniService.GetString("RemoteEndPoint", "Address");
+            string portString = _iniService.GetString("RemoteEndPoint", "Port");
+
+            return new IPEndPoint(IPAddress.Parse(addressString), Convert.ToInt32(portString));
+
+            /*return new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5555);*/
         }
         
         private void Update(object parameter)
