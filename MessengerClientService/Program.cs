@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Net;
 using System.ServiceProcess;
-using MessengerCoreLibrary.Services;
 
 namespace MessengerClientService
 {
