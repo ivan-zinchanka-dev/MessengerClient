@@ -9,7 +9,12 @@ public class ValidationErrorCollection : IEnumerable<IReadOnlyList<string>>
     private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
     
     public bool HasErrors => _errors.Any(error => error.Value.Any());
-    
+
+    public bool HasErrorsOf(string propertyName)
+    {
+        return _errors.ContainsKey(propertyName);
+    }
+
     public IEnumerable<string> GetErrors(string propertyName)
     {
         if (_errors.TryGetValue(propertyName, out List<string> errors))

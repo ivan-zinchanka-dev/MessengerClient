@@ -39,7 +39,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
                                                 "uppercase and lowercase Latin letters.";
     private const string PasswordConfirmErrorMessage = "Passwords do not match.";
 
-    private readonly IEnumerable<string> _validatableMemberNames;
+    private readonly IEnumerable<string> _validatablePropertyNames;
     private readonly ValidationErrorCollection _errorCollection = new ValidationErrorCollection();
     
     public event PropertyChangedEventHandler PropertyChanged;
@@ -53,7 +53,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         {
             _nickname = value;
             OnPropertyChanged();
-            Validate();
+            UpdatePropertyValidationState();
+            //Validate();
         }
     }
     
@@ -66,7 +67,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         {
             _password = value;
             OnPropertyChanged();
-            Validate();
+            UpdatePropertyValidationState();
+            //Validate();
         }
     }
     
@@ -78,7 +80,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         {
             _passwordConfirm = value;
             OnPropertyChanged();
-            Validate();
+            UpdatePropertyValidationState();
+            //Validate();
         }
     }
     
@@ -145,19 +148,11 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         
         _signInWindow = new SignInWindow();
         _signInWindow.DataContext = this;
-        
+         
         _signUpWindow = new SignUpWindow();
         _signUpWindow.DataContext = this;
 
-        _validatableMemberNames = GetType()
-            .GetProperties()
-            .Where(property => property.GetCustomAttributes(typeof(ValidationAttribute), true).Any())
-            .Select(property => property.Name);
-
-        foreach (var p in _validatableMemberNames)
-        {
-            Console.WriteLine(p);
-        }
+        _validatablePropertyNames = ValidationUtility.GetValidatablePropertyNames(this);
         
         _signInWindow.Closed += OnWindowClosed;
         _signUpWindow.Closed += OnWindowClosed;
@@ -266,7 +261,35 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     {
         _appInstance.Shutdown();
     }
-    
+
+    private void UpdatePropertyValidationState([CallerMemberName] string propertyName = null)
+    {
+        if (_errorCollection.HasErrorsOf(propertyName))
+        {
+            List<ValidationResult> results = new List<ValidationResult>();
+            ValidationContext context = new ValidationContext(this);
+
+            if (!Validator.TryValidateObject(this, context, results, true))
+            {
+                foreach (ValidationResult result in results)
+                {
+                    foreach (string resultPropertyName in result.MemberNames)
+                    {
+                        if (resultPropertyName == propertyName)
+                        {
+                            return;
+                        }
+
+                    }
+                }
+            }
+        }
+
+        _errorCollection.TryClearErrors(propertyName);
+        
+        OnErrorsChanged(propertyName);
+    }
+
     private bool Validate()
     {
         if (_currentView is SignInWindow)
@@ -277,7 +300,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         List<ValidationResult> results = new List<ValidationResult>();
         ValidationContext context = new ValidationContext(this);
 
-        foreach (string propertyName in _validatableMemberNames)
+        foreach (string propertyName in _validatablePropertyNames)
         {
             if (_errorCollection.TryClearErrors(propertyName)){
             
@@ -310,9 +333,22 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     
     private void UpdateErrorMessage()
     {
-        IEnumerable<string> errors = _errorCollection.SelectMany(errors => errors);
-        ErrorMessage = string.Join('\n', errors);
-    }
+        foreach (string propertyName in _validatablePropertyNames)
+        {
+            if (_errorCollection.HasErrorsOf(propertyName))
+            {
+                string error = _errorCollection.GetErrors(propertyName).FirstOrDefault();
+
+                if (!string.IsNullOrEmpty(error))
+                {
+                    ErrorMessage = error;
+                    return;
+                }
+            }
+        }
+
+        ErrorMessage = string.Empty;
+    } 
     
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
