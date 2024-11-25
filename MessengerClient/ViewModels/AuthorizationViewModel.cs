@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using MessengerClient.Commands;
@@ -17,8 +16,8 @@ namespace MessengerClient.ViewModels;
 
 public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 {
-    private const string PasswordRegexPattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$";
-    private const string ConnectionErrorMessage = "A connection error occurred.";
+    private const string NoSpacesRegexPattern = @"^\S*$";
+    private const string PasswordRegexPattern = @"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?!.*\s).{8,}$";
     
     private string _nickname;
     private string _password;
@@ -34,18 +33,14 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     private readonly SignUpWindow _signUpWindow;
     private Window _currentView;
     
-    private const string NicknameErrorMessage = "The nickname must not be empty.";
-    private const string PasswordErrorMessage = "The password must be at least 8 characters long and contain numbers,\n" +
-                                                "uppercase and lowercase Latin letters.";
-    private const string PasswordConfirmErrorMessage = "Passwords do not match.";
-
     private readonly IEnumerable<string> _validatablePropertyNames;
     private readonly ValidationErrorCollection _errorCollection = new ValidationErrorCollection();
     
     public event PropertyChangedEventHandler PropertyChanged;
     public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
     
-    [Required(AllowEmptyStrings = false, ErrorMessage = NicknameErrorMessage)]
+    [Required(AllowEmptyStrings = false, ErrorMessage = Messages.NicknameErrorMessage)]
+    [RegularExpression(NoSpacesRegexPattern, ErrorMessage = Messages.NicknameErrorMessage)]
     public string Nickname
     {
         get => _nickname;
@@ -54,12 +49,11 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
             _nickname = value;
             OnPropertyChanged();
             UpdatePropertyValidationState();
-            //Validate();
         }
     }
     
-    [Required(ErrorMessage = PasswordErrorMessage)] 
-    [RegularExpression(PasswordRegexPattern, ErrorMessage = PasswordErrorMessage)]
+    [Required(ErrorMessage = Messages.PasswordErrorMessage)] 
+    [RegularExpression(PasswordRegexPattern, ErrorMessage = Messages.PasswordErrorMessage)]
     public string Password
     {
         get => _password;
@@ -68,11 +62,10 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
             _password = value;
             OnPropertyChanged();
             UpdatePropertyValidationState();
-            //Validate();
         }
     }
     
-    [Compare(nameof(Password), ErrorMessage = PasswordConfirmErrorMessage)]
+    [Compare(nameof(Password), ErrorMessage = Messages.PasswordConfirmErrorMessage)]
     public string PasswordConfirm
     {
         get => _passwordConfirm;
@@ -81,7 +74,6 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
             _passwordConfirm = value;
             OnPropertyChanged();
             UpdatePropertyValidationState();
-            //Validate();
         }
     }
     
@@ -114,7 +106,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
             {
                 if (!_appInstance.IsClientConnected)
                 {
-                    ErrorMessage = ConnectionErrorMessage;
+                    ErrorMessage = Messages.ConnectionErrorMessage;
                 }
                 else
                 {
@@ -141,7 +133,16 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
             });
         }
     }
-    
+
+    private static class Messages
+    {
+        public const string ConnectionErrorMessage = "A connection error occurred.";
+        public const string NicknameErrorMessage = "The nickname must not be empty and must not contain spaces.";
+        public const string PasswordErrorMessage = "The password must be at least 8 characters long and contain numbers,\n" + 
+                                                   "uppercase and lowercase Latin letters, and must not contain spaces.";
+        public const string PasswordConfirmErrorMessage = "Passwords do not match.";
+    }
+
     public AuthorizationViewModel(App appInstance)
     {
         _appInstance = appInstance;
@@ -180,7 +181,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         
         if (!_appInstance.IsClientConnected)
         {
-            ErrorMessage = ConnectionErrorMessage;
+            ErrorMessage = Messages.ConnectionErrorMessage;
             return false;
         }
 
@@ -208,7 +209,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
                 {
                     ErrorMessage = _appInstance.IsClientConnected ? 
                         "This user does not exist or the password is incorrect." : 
-                        ConnectionErrorMessage;
+                        Messages.ConnectionErrorMessage;
                 }
                 
             }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -229,7 +230,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
                 {
                     ErrorMessage = _appInstance.IsClientConnected ? 
                         "This nickname is already taken." : 
-                        ConnectionErrorMessage;
+                        Messages.ConnectionErrorMessage;
                 }
                 
             }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -359,4 +360,5 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     {
         ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
     }
+    
 }

@@ -60,7 +60,7 @@
             </TextBox>
             
             <TextBlock Margin="0 15 0 0"
-                       Height="60"
+                       Height="70"
                        FontSize="13"
                        Text="{Binding ErrorMessage, UpdateSourceTrigger=PropertyChanged}" 
                        TextAlignment="Center" 
