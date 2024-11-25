@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MessengerClient.Validation;
 
-public class ValidationErrorCollection
+public class ValidationErrorCollection : IEnumerable<IReadOnlyList<string>>
 {
     private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
     
@@ -51,5 +52,18 @@ public class ValidationErrorCollection
     public void ClearAllErrors()
     {
         _errors.Clear();
+    }
+
+    public IEnumerator<IReadOnlyList<string>> GetEnumerator()
+    {
+        foreach (var errorList in _errors.Values)
+        {
+            yield return errorList;
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }
