@@ -33,8 +33,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     private readonly SignUpWindow _signUpWindow;
     private Window _currentView;
     
-    private readonly IEnumerable<string> _validatablePropertyNames;
-    private readonly ValidationErrorCollection _errorCollection = new ValidationErrorCollection();
+    private readonly ValidationComponent _validationComponent;
     
     public event PropertyChangedEventHandler PropertyChanged;
     public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
@@ -153,7 +152,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         _signUpWindow = new SignUpWindow();
         _signUpWindow.DataContext = this;
 
-        _validatablePropertyNames = ValidationUtility.GetValidatablePropertyNames(this);
+        _validationComponent = new ValidationComponent(this);
+        _validationComponent.OnErrorsChanged += OnErrorsChanged;
         
         _signInWindow.Closed += OnWindowClosed;
         _signUpWindow.Closed += OnWindowClosed;
@@ -172,8 +172,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         _signUpWindow.Hide();
     }
     
-    public bool HasErrors => _errorCollection.HasErrors;
-    public IEnumerable GetErrors(string propertyName) => _errorCollection.GetErrors(propertyName);
+    public bool HasErrors => _validationComponent.ErrorCollection.HasErrors;
+    public IEnumerable GetErrors(string propertyName) => _validationComponent.ErrorCollection.GetErrors(propertyName);
     
     private bool TryGetValidatedUser(out User user)
     {
@@ -185,7 +185,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
             return false;
         }
 
-        if (!Validate())
+        if (!ValidateViewModel())
         {
             return false;
         }
@@ -251,7 +251,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     {
         _signUpWindow.Hide();
         
-        _errorCollection.ClearAllErrors();
+        _validationComponent.ErrorCollection.ClearAllErrors();
         UpdateErrorMessage();
         
         _currentView = _signInWindow;
@@ -265,80 +265,29 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
 
     private void UpdatePropertyValidationState([CallerMemberName] string propertyName = null)
     {
-        if (_errorCollection.HasErrorsOf(propertyName))
-        {
-            List<ValidationResult> results = new List<ValidationResult>();
-            ValidationContext context = new ValidationContext(this);
-
-            if (!Validator.TryValidateObject(this, context, results, true))
-            {
-                foreach (ValidationResult result in results)
-                {
-                    foreach (string resultPropertyName in result.MemberNames)
-                    {
-                        if (resultPropertyName == propertyName)
-                        {
-                            return;
-                        }
-
-                    }
-                }
-            }
-        }
-
-        _errorCollection.TryClearErrors(propertyName);
-        
-        OnErrorsChanged(propertyName);
+        _validationComponent.UpdatePropertyValidationState(propertyName);
+        UpdateErrorMessage();
     }
 
-    private bool Validate()
+    private bool ValidateViewModel()
     {
         if (_currentView is SignInWindow)
         {
             return true;
         }
-        
-        List<ValidationResult> results = new List<ValidationResult>();
-        ValidationContext context = new ValidationContext(this);
 
-        foreach (string propertyName in _validatablePropertyNames)
-        {
-            if (_errorCollection.TryClearErrors(propertyName)){
-            
-                OnErrorsChanged(propertyName); 
-            }
-        }
-        
-        if (!Validator.TryValidateObject(this, context, results, true))
-        {
-            foreach (ValidationResult result in results)
-            {
-                foreach (string propertyName in result.MemberNames)
-                {
-                    if (_errorCollection.TryAddError(propertyName, result.ErrorMessage))
-                    {
-                        OnErrorsChanged(propertyName);
-                    }
-                }
-            }
-
-            UpdateErrorMessage();
-            return false;
-        }
-        else
-        {
-            UpdateErrorMessage();
-            return true;
-        }
+        bool result = _validationComponent.ValidateModel();
+        UpdateErrorMessage();
+        return result;
     }
     
     private void UpdateErrorMessage()
     {
-        foreach (string propertyName in _validatablePropertyNames)
+        foreach (string propertyName in _validationComponent.PropertyNames)
         {
-            if (_errorCollection.HasErrorsOf(propertyName))
+            if (_validationComponent.ErrorCollection.HasErrorsOf(propertyName))
             {
-                string error = _errorCollection.GetErrors(propertyName).FirstOrDefault();
+                string error = _validationComponent.ErrorCollection.GetErrors(propertyName).FirstOrDefault();
 
                 if (!string.IsNullOrEmpty(error))
                 {
