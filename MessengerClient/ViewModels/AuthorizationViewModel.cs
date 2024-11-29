@@ -133,6 +133,8 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         }
     }
 
+    public bool HasErrors => _validationComponent.ErrorCollection.HasErrors;
+    
     private static class Messages
     {
         public const string ConnectionErrorMessage = "A connection error occurred.";
@@ -140,6 +142,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         public const string PasswordErrorMessage = "The password must be at least 8 characters long and contain numbers,\n" + 
                                                    "uppercase and lowercase Latin letters, and must not contain spaces.";
         public const string PasswordConfirmErrorMessage = "Passwords do not match.";
+
+        public const string SignInFail = "This user does not exist or the password is incorrect.";
+        public const string SignUpFail = "This nickname is already taken.";
     }
 
     public AuthorizationViewModel(App appInstance)
@@ -172,7 +177,6 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         _signUpWindow.Hide();
     }
     
-    public bool HasErrors => _validationComponent.ErrorCollection.HasErrors;
     public IEnumerable GetErrors(string propertyName) => _validationComponent.ErrorCollection.GetErrors(propertyName);
     
     private bool TryGetValidatedUser(out User user)
@@ -207,9 +211,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
                 }
                 else
                 {
-                    ErrorMessage = _appInstance.IsClientConnected ? 
-                        "This user does not exist or the password is incorrect." : 
-                        Messages.ConnectionErrorMessage;
+                    ErrorMessage = _appInstance.IsClientConnected ? Messages.SignInFail : Messages.ConnectionErrorMessage;
                 }
                 
             }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -228,9 +230,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
                 }
                 else
                 {
-                    ErrorMessage = _appInstance.IsClientConnected ? 
-                        "This nickname is already taken." : 
-                        Messages.ConnectionErrorMessage;
+                    ErrorMessage = _appInstance.IsClientConnected ? Messages.SignUpFail : Messages.ConnectionErrorMessage;
                 }
                 
             }, TaskScheduler.FromCurrentSynchronizationContext());
