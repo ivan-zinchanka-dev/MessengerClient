@@ -18,8 +18,7 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
     private string _messageInputText;
     private bool _isSendMessageAllowed;
     private RelayCommand _sendMessageCommand;
-
-    private readonly AppClient _appClient;
+    
     private readonly App _appInstance;
 
     private bool _polling; 
@@ -86,12 +85,9 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
         }
     }
     
-    public ChatViewModel(App appInstance, AppClient appClient)
+    public ChatViewModel(App appInstance)
     {
         _appInstance = appInstance;
-        _appClient = appClient;
-
-        
         
         /*_window = new ChatWindow();
         _window.DataContext = this;*/
@@ -105,8 +101,8 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
         }
 
         _dispatcher = dispatcher;
-        _appClient.ChatUpdater.Start();
-        _appClient.ChatUpdater.OnUpdate += UpdateMessagesList;
+        _appInstance.ChatUpdater.Start();
+        _appInstance.ChatUpdater.OnUpdate += UpdateMessagesList;
         
         _polling = true;
     }
@@ -157,8 +153,8 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
             return;
         }
 
-        _appClient.ChatUpdater.Stop();
-        _appClient.ChatUpdater.OnUpdate -= UpdateMessagesList;
+        _appInstance.ChatUpdater.Stop();
+        _appInstance.ChatUpdater.OnUpdate -= UpdateMessagesList;
         _polling = false;
     }
 

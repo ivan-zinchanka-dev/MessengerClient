@@ -7,10 +7,11 @@ namespace MessengerClient.Management;
 public class WindowManager
 {
     private readonly IServiceProvider _serviceProvider;
-    private Window _currentWindow;
+    private Window _activeWindow;
 
-    public Window CurrentWindow => _currentWindow;
+    public Window ActiveWindow => _activeWindow;
     public event Action<Window> OnWindowSwitched;
+    public event Action OnAllWindowsClosed;
     
     public WindowManager(IServiceProvider serviceProvider)
     {
@@ -21,29 +22,37 @@ public class WindowManager
     {
         Type windowType = typeof(TWindow);
 
-        if (windowType == _currentWindow?.GetType())
+        if (windowType == _activeWindow?.GetType())
         {
             return false; 
         }
 
-        if (_serviceProvider.GetService<TWindow>() is Window window)
+        if (_serviceProvider.GetRequiredService<TWindow>() is Window window)
         {
-            Window previousWindow = _currentWindow;
+            Window previousWindow = _activeWindow;
             
-            _currentWindow = window;
-            _currentWindow.Show();
+            _activeWindow = window;
+            _activeWindow.Show();
+            _activeWindow.Closed += OnActiveWindowClosed;
             
             if (previousWindow != null)
             {
+                previousWindow.Closed -= OnActiveWindowClosed;
                 previousWindow.Close();
             }
             
-            OnWindowSwitched?.Invoke(_currentWindow);
+            OnWindowSwitched?.Invoke(_activeWindow);
             return true;
         }
         else
         {
             return false;
         }
+    }
+
+    private void OnActiveWindowClosed(object sender, EventArgs eventArgs)
+    {
+        _activeWindow = null;
+        OnAllWindowsClosed?.Invoke();
     }
 }

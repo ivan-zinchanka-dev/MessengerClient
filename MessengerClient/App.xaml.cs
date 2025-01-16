@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -99,17 +100,20 @@ namespace MessengerClient
         {
             base.OnStartup(e);
             
+            PresentationTraceSources.DataBindingSource.Listeners.Add(new BindingErrorTraceListener());
+            PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Error;
+            
             AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
             DispatcherUnhandledException += OnDispatcherUnhandledException;
             
             await _host.StartAsync();
             _appClient = _sharedOptions.AppClient;
-
             
             _windowManager = _host.Services.GetRequiredService<WindowManager>();
             _windowManager.SwitchTo<SignInWindow>();
+            _windowManager.OnAllWindowsClosed += Shutdown;
         }
-        
+
         protected override async void OnExit(ExitEventArgs e)
         {
             await _host.StopAsync();
