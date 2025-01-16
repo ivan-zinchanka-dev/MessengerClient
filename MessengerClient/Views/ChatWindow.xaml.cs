@@ -1,12 +1,20 @@
 ﻿using System.Windows;
+using MessengerClient.ViewModels;
 
 namespace MessengerClient.Views;
 
 public partial class ChatWindow : Window
 {
-    public ChatWindow()
+    private readonly ChatViewModel _viewModel;
+    
+    public ChatWindow(ChatViewModel viewModel)
     {
+        _viewModel = viewModel;
+        
+        DataContext = _viewModel;
         InitializeComponent();
+        
+        _viewModel.StartPolling(Dispatcher);
     }
 
     public void ScrollMessagesListToEnd()

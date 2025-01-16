@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Windows;
 using MessengerClient.Commands;
+using MessengerClient.Management;
 using MessengerClient.Validation;
 using MessengerClient.Views;
 using MessengerCoreLibrary.Models;
@@ -29,9 +28,10 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     private RelayCommand _backCommand;
 
     private readonly App _appInstance;
-    private readonly SignInWindow _signInWindow;
+    private readonly WindowManager _windowManager;
+    /*private readonly SignInWindow _signInWindow;
     private readonly SignUpWindow _signUpWindow;
-    private Window _currentView;
+    private Window _currentView;*/
     
     private readonly ValidationComponent _validationComponent;
     
@@ -109,11 +109,11 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
                 }
                 else
                 {
-                    if (_currentView is SignInWindow)
+                    if (_windowManager.CurrentWindow is SignInWindow)
                     {
                         SwitchToSignUpWindow();
                     }
-                    else if (_currentView is SignUpWindow)
+                    else if (_windowManager.CurrentWindow is SignUpWindow)
                     {
                         SignUpIfPossible();
                     }
@@ -147,34 +147,13 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         public const string SignUpFail = "This nickname is already taken.";
     }
 
-    public AuthorizationViewModel(App appInstance)
+    public AuthorizationViewModel(App appInstance, WindowManager windowManager)
     {
         _appInstance = appInstance;
+        _windowManager = windowManager;
         
-        _signInWindow = new SignInWindow();
-        _signInWindow.DataContext = this;
-         
-        _signUpWindow = new SignUpWindow();
-        _signUpWindow.DataContext = this;
-
         _validationComponent = new ValidationComponent(this);
         _validationComponent.OnErrorsChanged += OnErrorsChanged;
-        
-        _signInWindow.Closed += OnWindowClosed;
-        _signUpWindow.Closed += OnWindowClosed;
-
-        _currentView = _signInWindow;
-    }
-    
-    public void ShowSignInWindow()
-    {
-        _signInWindow.Show();
-    }
-
-    public void HideAllWindows()
-    {
-        _signInWindow.Hide();
-        _signUpWindow.Hide();
     }
     
     public IEnumerable GetErrors(string propertyName) => _validationComponent.ErrorCollection.GetErrors(propertyName);
@@ -239,23 +218,15 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     
     private void SwitchToSignUpWindow()
     {
-        _signInWindow.Hide();
-        
         UpdateErrorMessage();
-        
-        _currentView = _signUpWindow;
-        _signUpWindow.Show();
+        _windowManager.SwitchTo<SignUpWindow>();
     }
     
     private void SwitchToSignInWindow()
     {
-        _signUpWindow.Hide();
-        
         _validationComponent.ErrorCollection.ClearAllErrors();
         UpdateErrorMessage();
-        
-        _currentView = _signInWindow;
-        _signInWindow.Show();
+        _windowManager.SwitchTo<SignInWindow>();
     }
     
     private void OnWindowClosed(object sender, EventArgs e)
@@ -271,11 +242,11 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
 
     private bool ValidateViewModel()
     {
-        if (_currentView is SignInWindow)
+        if (_windowManager.CurrentWindow is SignInWindow)
         {
             return true;
         }
-
+        
         bool result = _validationComponent.ValidateModel();
         UpdateErrorMessage();
         return result;

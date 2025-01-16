@@ -4,21 +4,27 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using MessengerClient.Commands;
+using MessengerClient.Network;
 using MessengerClient.Views;
 using MessengerCoreLibrary.Models;
 
 namespace MessengerClient.ViewModels;
 
-public class ChatViewModel : INotifyPropertyChanged
+public class ChatViewModel : INotifyPropertyChanged, IDisposable
 {
     private ObservableCollection<Message> _messages = new ObservableCollection<Message>();
     private string _messageInputText;
     private bool _isSendMessageAllowed;
     private RelayCommand _sendMessageCommand;
 
+    private readonly AppClient _appClient;
     private readonly App _appInstance;
-    private readonly ChatWindow _window;
+
+    private bool _polling; 
+    private Dispatcher _dispatcher;
+    //private readonly ChatWindow _window;
     private bool _messagesUpdatedOnce;
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -80,42 +86,59 @@ public class ChatViewModel : INotifyPropertyChanged
         }
     }
     
-    public ChatViewModel(App appInstance)
+    public ChatViewModel(App appInstance, AppClient appClient)
     {
         _appInstance = appInstance;
+        _appClient = appClient;
+
         
-        _window = new ChatWindow();
-        _window.DataContext = this;
+        
+        /*_window = new ChatWindow();
+        _window.DataContext = this;*/
     }
 
-    public void ShowWindow()
+    public void StartPolling(Dispatcher dispatcher)
+    {
+        if (_polling)
+        {
+            return;
+        }
+
+        _dispatcher = dispatcher;
+        _appClient.ChatUpdater.Start();
+        _appClient.ChatUpdater.OnUpdate += UpdateMessagesList;
+        
+        _polling = true;
+    }
+
+    /*public void ShowWindow()
     {
         _window.Show();
         _window.Closed += OnWindowClosedByUser;
         _appInstance.ChatUpdater.Start();
         _appInstance.ChatUpdater.OnUpdate += UpdateMessagesList;
-    }
+    }*/
 
     private void UpdateMessagesList(List<Message> actualMessages)
     {
-        _window.Dispatcher.Invoke(() =>
+        _dispatcher.Invoke(() =>
         {
             Messages = new ObservableCollection<Message>(actualMessages);
 
             if (!_messagesUpdatedOnce)
             {
-                _window.ScrollMessagesListToEnd();
+                //_window.ScrollMessagesListToEnd();        //TODO ADD
                 _messagesUpdatedOnce = true;
             }
         });
     }
 
-    private void OnWindowClosedByUser(object sender, EventArgs e)
+    /*private void OnWindowClosedByUser(object sender, EventArgs e)
     {
         _appInstance.ChatUpdater.Stop();
         _appInstance.ChatUpdater.OnUpdate -= UpdateMessagesList;
         _appInstance.Shutdown();
-    }
+    }*/
     
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
@@ -126,4 +149,18 @@ public class ChatViewModel : INotifyPropertyChanged
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+
+    public void StopPolling()
+    {
+        if (!_polling)
+        {
+            return;
+        }
+
+        _appClient.ChatUpdater.Stop();
+        _appClient.ChatUpdater.OnUpdate -= UpdateMessagesList;
+        _polling = false;
+    }
+
+    public void Dispose() => StopPolling();
 }

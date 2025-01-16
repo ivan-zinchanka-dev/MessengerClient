@@ -4,8 +4,10 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using MessengerClient.Management;
 using MessengerClient.Network;
 using MessengerClient.ViewModels;
+using MessengerClient.Views;
 using MessengerCoreLibrary.Models;
 using MessengerCoreLibrary.Services;
 using MessengerCoreLibrary.Services.FileLogging;
@@ -27,6 +29,8 @@ namespace MessengerClient
         private AppClient _appClient;
         private AuthorizationViewModel _authorizationViewModel;
         private ChatViewModel _chatViewModel;
+
+        private WindowManager _windowManager;
         
         public User CurrentUser { get; private set; }
         public bool IsClientConnected => _appClient.IsConnected;
@@ -53,31 +57,18 @@ namespace MessengerClient
                         .AddSingleton<AppSharedOptions>(_sharedOptions)
                         .AddSingleton<App>(this)
                         .AddHostedService<AppClient>()
-                        .AddSingleton<AuthorizationViewModel>()
-                        .AddSingleton<ChatViewModel>();
+                        .AddSingleton<WindowManager>()
+                        .AddTransient<AuthorizationViewModel>()
+                        .AddTransient<ChatViewModel>()
+                        .AddTransient<SignInWindow>()
+                        .AddTransient<SignUpWindow>()
+                        .AddTransient<ChatWindow>();
                 })
                 .Build();
 
             _logger = _host.Services.GetRequiredService<ILogger<App>>();
         }
-
-        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-        {
-            _logger.LogError( e.Exception, "An unhandled exception occurred.");
-        }
-
-        private void OnAppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            if (e.ExceptionObject is Exception exception)
-            {
-                _logger.LogError(exception, "An unhandled exception occurred."); 
-            }
-            else
-            {
-                _logger.LogError(e.ExceptionObject.ToString());
-            }
-        }
-
+        
         public async Task<bool> TrySignInAsync(User user)
         {
             bool result = await _appClient.TrySignInAsync(user);
@@ -113,11 +104,10 @@ namespace MessengerClient
             
             await _host.StartAsync();
             _appClient = _sharedOptions.AppClient;
+
             
-            _authorizationViewModel = _host.Services
-                .GetRequiredService<AuthorizationViewModel>();
-            
-            _authorizationViewModel.ShowSignInWindow();
+            _windowManager = _host.Services.GetRequiredService<WindowManager>();
+            _windowManager.SwitchTo<SignInWindow>();
         }
         
         protected override async void OnExit(ExitEventArgs e)
@@ -134,10 +124,7 @@ namespace MessengerClient
         private void Authorize(User authorizedUser)
         {
             CurrentUser = authorizedUser;
-            _authorizationViewModel.HideAllWindows();
-            
-            _chatViewModel = _host.Services.GetRequiredService<ChatViewModel>();
-            _chatViewModel.ShowWindow();
+            _windowManager.SwitchTo<ChatWindow>();
         }
 
         private string GetLogsFileName()
@@ -156,6 +143,23 @@ namespace MessengerClient
                 nameof(_sharedOptions.RemoteEndPoint.Port));
             
             return new IPEndPoint(IPAddress.Parse(addressString), Convert.ToInt32(portString));
+        }
+        
+        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            _logger.LogError( e.Exception, "An unhandled exception occurred.");
+        }
+
+        private void OnAppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            if (e.ExceptionObject is Exception exception)
+            {
+                _logger.LogError(exception, "An unhandled exception occurred."); 
+            }
+            else
+            {
+                _logger.LogError(e.ExceptionObject.ToString());
+            }
         }
     }
 }
