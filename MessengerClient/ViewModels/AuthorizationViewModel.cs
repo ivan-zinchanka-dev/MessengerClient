@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using MessengerClient.Commands;
 using MessengerClient.Management;
+using MessengerClient.Network;
 using MessengerClient.Validation;
 using MessengerClient.Views;
 using MessengerCoreLibrary.Models;
@@ -26,13 +27,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     private RelayCommand _signInCommand;
     private RelayCommand _signUpCommand;
     private RelayCommand _backCommand;
-
-    private readonly App _appInstance;
-    private readonly WindowManager _windowManager;
-    /*private readonly SignInWindow _signInWindow;
-    private readonly SignUpWindow _signUpWindow;
-    private Window _currentView;*/
     
+    private readonly AppClient _appClient;
+    private readonly WindowManager _windowManager;
     private readonly ValidationComponent _validationComponent;
     
     public event PropertyChangedEventHandler PropertyChanged;
@@ -103,7 +100,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         {
             return _signUpCommand ??= new RelayCommand(obj =>
             {
-                if (!_appInstance.IsClientConnected)
+                if (!_appClient.IsConnected)
                 {
                     ErrorMessage = Messages.ConnectionErrorMessage;
                 }
@@ -147,9 +144,9 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         public const string SignUpFail = "This nickname is already taken.";
     }
 
-    public AuthorizationViewModel(App appInstance, WindowManager windowManager)
+    public AuthorizationViewModel(AppSharedOptions sharedOptions, WindowManager windowManager)
     {
-        _appInstance = appInstance;
+        _appClient = sharedOptions.AppClient;
         _windowManager = windowManager;
         
         _validationComponent = new ValidationComponent(this);
@@ -162,7 +159,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     {
         user = null;
         
-        if (!_appInstance.IsClientConnected)
+        if (!_appClient.IsConnected)
         {
             ErrorMessage = Messages.ConnectionErrorMessage;
             return false;
@@ -182,15 +179,16 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     {
         if (TryGetValidatedUser(out User user))
         {
-            _appInstance.TrySignInAsync(user).ContinueWith(task =>
+            _appClient.TrySignInAsync(user).ContinueWith(task =>
             {
                 if (task.Result)
                 {
                     ErrorMessage = string.Empty;
+                    _windowManager.SwitchTo<ChatWindow>();
                 }
                 else
                 {
-                    ErrorMessage = _appInstance.IsClientConnected ? Messages.SignInFail : Messages.ConnectionErrorMessage;
+                    ErrorMessage = _appClient.IsConnected ? Messages.SignInFail : Messages.ConnectionErrorMessage;
                 }
                 
             }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -201,15 +199,16 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
     { 
         if (TryGetValidatedUser(out User user))
         {
-            _appInstance.TrySignUpAsync(user).ContinueWith(task =>
+            _appClient.TrySignUpAsync(user).ContinueWith(task =>
             {
                 if (task.Result)
                 {
                     ErrorMessage = string.Empty;
+                    _windowManager.SwitchTo<ChatWindow>();
                 }
                 else
                 {
-                    ErrorMessage = _appInstance.IsClientConnected ? Messages.SignUpFail : Messages.ConnectionErrorMessage;
+                    ErrorMessage = _appClient.IsConnected ? Messages.SignUpFail : Messages.ConnectionErrorMessage;
                 }
                 
             }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -227,11 +226,6 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
         _validationComponent.ErrorCollection.ClearAllErrors();
         UpdateErrorMessage();
         _windowManager.SwitchTo<SignInWindow>();
-    }
-    
-    private void OnWindowClosed(object sender, EventArgs e)
-    {
-        _appInstance.Shutdown();
     }
 
     private void UpdatePropertyValidationState([CallerMemberName] string propertyName = null)

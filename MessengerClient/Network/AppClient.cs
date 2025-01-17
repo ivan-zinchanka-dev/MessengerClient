@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading;
@@ -16,6 +17,7 @@ public class AppClient : BackgroundService
     private readonly TcpClient _tcpClient;
     private readonly ILogger<AppClient> _logger;
     
+    public User CurrentUser { get; private set; }
     public ChatUpdater ChatUpdater { get; private set; }
     public bool IsConnected { get; private set; }
     
@@ -61,7 +63,14 @@ public class AppClient : BackgroundService
         await networkAdaptor.SendQueryAsync(query);
         
         Response response = await networkAdaptor.ReceiveResponseAsync();
-        return JsonSerializer.Deserialize<bool>(response.JsonDataString);
+        bool result = JsonSerializer.Deserialize<bool>(response.JsonDataString);
+
+        if (result)
+        {
+            CurrentUser = user;
+        }
+
+        return result;
     }
     
     public async Task<bool> TrySignInAsync(User user)
@@ -79,7 +88,14 @@ public class AppClient : BackgroundService
         await networkAdaptor.SendQueryAsync(query);
         
         Response response = await networkAdaptor.ReceiveResponseAsync();
-        return JsonSerializer.Deserialize<bool>(response.JsonDataString);
+        bool result = JsonSerializer.Deserialize<bool>(response.JsonDataString);
+        
+        if (result)
+        {
+            CurrentUser = user;
+        }
+
+        return result;
     }
 
     public async Task<List<Message>> GetMessagesAsync()

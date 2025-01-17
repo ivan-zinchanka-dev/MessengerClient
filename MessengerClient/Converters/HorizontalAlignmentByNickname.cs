@@ -2,18 +2,26 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using MessengerClient.Network;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MessengerClient.Converters;
 
 public class HorizontalAlignmentByNickname : IValueConverter
 {
     private readonly App _appInstance = Application.Current as App;
-
+    private readonly AppClient _appClient;
+    
+    public HorizontalAlignmentByNickname()
+    {
+         _appClient = _appInstance.Services.GetRequiredService<AppSharedOptions>().AppClient;
+    }
+    
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is string nickname)
         {
-            return nickname == _appInstance.CurrentUser.Nickname ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+            return nickname == _appClient.CurrentUser.Nickname ? HorizontalAlignment.Right : HorizontalAlignment.Left;
         }
         else
         {
@@ -25,7 +33,7 @@ public class HorizontalAlignmentByNickname : IValueConverter
     {
         if (value is HorizontalAlignment textAlignment && textAlignment == HorizontalAlignment.Right)
         {
-            return _appInstance.CurrentUser.Nickname;
+            return _appClient.CurrentUser.Nickname;
         }
         else
         {

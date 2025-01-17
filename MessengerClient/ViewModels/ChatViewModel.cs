@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using MessengerClient.Commands;
+using MessengerClient.Network;
 using MessengerCoreLibrary.Models;
 
 namespace MessengerClient.ViewModels;
@@ -17,7 +18,7 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
     private bool _isSendMessageAllowed;
     private RelayCommand _sendMessageCommand;
     
-    private readonly App _appInstance;
+    private readonly AppClient _appClient;
     private bool _polling; 
     private Dispatcher _dispatcher;
     
@@ -66,9 +67,9 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
         }
     }
     
-    public ChatViewModel(App appInstance)
+    public ChatViewModel(AppSharedOptions sharedOptions)
     {
-        _appInstance = appInstance;
+        _appClient = sharedOptions.AppClient;
     }
 
     public void StartPolling(Dispatcher dispatcher)
@@ -79,8 +80,8 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
         }
 
         _dispatcher = dispatcher;
-        _appInstance.ChatUpdater.Start();
-        _appInstance.ChatUpdater.OnUpdate += UpdateMessagesList;
+        _appClient.ChatUpdater.Start();
+        _appClient.ChatUpdater.OnUpdate += UpdateMessagesList;
         
         _polling = true;
     }
@@ -92,8 +93,8 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
             return;
         }
 
-        _appInstance.ChatUpdater.Stop();
-        _appInstance.ChatUpdater.OnUpdate -= UpdateMessagesList;
+        _appClient.ChatUpdater.Stop();
+        _appClient.ChatUpdater.OnUpdate -= UpdateMessagesList;
         _polling = false;
     }
 
@@ -101,12 +102,12 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
 
     private void SendMessage()
     {
-        Message message = new Message(_appInstance.CurrentUser.Nickname, null, 
+        Message message = new Message(_appClient.CurrentUser.Nickname, null, 
             _messageInputText, DateTime.UtcNow);
                 
         _messages.Add(message);
 
-        _appInstance.PostMessageAsync(message).ContinueWith(task =>
+        _appClient.PostMessageAsync(message).ContinueWith(task =>
         {
             MessageInputText = string.Empty;
             
