@@ -20,7 +20,6 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
     
     private readonly AppClient _appClient;
     private bool _polling; 
-    private Dispatcher _dispatcher;
     
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -72,14 +71,13 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
         _appClient = sharedOptions.AppClient;
     }
 
-    public void StartPolling(Dispatcher dispatcher)
+    public void StartPolling()
     {
         if (_polling)
         {
             return;
         }
-
-        _dispatcher = dispatcher;
+        
         _appClient.ChatUpdater.Start();
         _appClient.ChatUpdater.OnUpdate += UpdateMessagesList;
         
@@ -116,10 +114,7 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
 
     private void UpdateMessagesList(List<Message> actualMessages)
     {
-        _dispatcher.Invoke(() =>
-        {
-            Messages = new ObservableCollection<Message>(actualMessages);
-        });
+        Messages = new ObservableCollection<Message>(actualMessages);
     }
     
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

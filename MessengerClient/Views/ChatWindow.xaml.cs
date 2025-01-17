@@ -17,7 +17,7 @@ public partial class ChatWindow : Window
         InitializeComponent();
         
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
-        _viewModel.StartPolling(Dispatcher);
+        _viewModel.StartPolling();
         
         Unloaded += OnUnloaded;
     }
