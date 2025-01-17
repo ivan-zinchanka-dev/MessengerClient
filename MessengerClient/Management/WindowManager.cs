@@ -9,8 +9,7 @@ public class WindowManager
     private readonly IServiceProvider _serviceProvider;
     private Window _activeWindow;
 
-    public Window ActiveWindow => _activeWindow;
-    public event Action<Window> OnWindowSwitched;
+    public Type ActiveWindowType => _activeWindow?.GetType();
     public event Action OnAllWindowsClosed;
     
     public WindowManager(IServiceProvider serviceProvider)
@@ -41,7 +40,6 @@ public class WindowManager
                 previousWindow.Close();
             }
             
-            OnWindowSwitched?.Invoke(_activeWindow);
             return true;
         }
         else

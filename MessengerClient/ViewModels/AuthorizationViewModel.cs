@@ -106,11 +106,11 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
                 }
                 else
                 {
-                    if (_windowManager.ActiveWindow is SignInWindow)
+                    if (_windowManager.ActiveWindowType == typeof(SignInWindow))
                     {
                         SwitchToSignUpWindow();
                     }
-                    else if (_windowManager.ActiveWindow is SignUpWindow)
+                    else if (_windowManager.ActiveWindowType == typeof(SignUpWindow))
                     {
                         SignUpIfPossible();
                     }
@@ -236,7 +236,7 @@ public class AuthorizationViewModel : INotifyPropertyChanged, INotifyDataErrorIn
 
     private bool ValidateViewModel()
     {
-        if (_windowManager.ActiveWindow is SignInWindow)
+        if (_windowManager.ActiveWindowType == typeof(SignInWindow))
         {
             return true;
         }
