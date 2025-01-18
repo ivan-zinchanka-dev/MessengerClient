@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 using MessengerClient.Commands;
 using MessengerClient.Network;
 using MessengerCoreLibrary.Models;
@@ -29,6 +28,7 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
         set
         {
             _messageInputText = value;
+            IsSendMessageAllowed = !string.IsNullOrWhiteSpace(_messageInputText) && _messageInputText != string.Empty;
             OnPropertyChanged();
         }
     }
@@ -119,11 +119,6 @@ public class ChatViewModel : INotifyPropertyChanged, IDisposable
     
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-        if (propertyName == nameof(MessageInputText))
-        {
-            IsSendMessageAllowed = !string.IsNullOrWhiteSpace(_messageInputText) && _messageInputText != string.Empty;
-        }
-
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
