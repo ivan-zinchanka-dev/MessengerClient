@@ -15,21 +15,21 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    
-    <Style x:Key="FocusVisual">
+	
+	<Style x:Key="FocusVisual">
 		<Setter Property="Control.Template">
-		    <Setter.Value>
-			    <ControlTemplate TargetType="{x:Type Control}">
-				    <Grid Margin="3 2">
-					    <Rectangle Name="r1" StrokeThickness="1" Stroke="Black" StrokeDashArray="2 2"/>
-					    <Border Name="border" Width="{TemplateBinding ActualWidth}" Height="{TemplateBinding ActualHeight}"  CornerRadius="2" BorderThickness="1" />
-				    </Grid>
-			    </ControlTemplate>
-		    </Setter.Value>
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type Control}">
+					<Grid Margin="3 2">
+						<Rectangle Name="r1" StrokeThickness="1" Stroke="Black" StrokeDashArray="2 2"/>
+						<Border Name="border" Width="{TemplateBinding ActualWidth}" Height="{TemplateBinding ActualHeight}"  CornerRadius="2" BorderThickness="1" />
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
 		</Setter>
 	</Style>
-	    
-    <Style x:Key="InformButton" TargetType="Button">
+	
+    <Style TargetType="Button">
 	    <Setter Property="OverridesDefaultStyle" Value="True"/>
 	    <Setter Property="Margin" Value="2"/>
 	    <Setter Property="FontFamily" Value="David"/>
@@ -114,7 +114,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
                     <Canvas Height="10">
-                        <Polygon Fill="LightBlue" Points="2,10 14,10 8,2"/>
+                        <Polygon Fill="#91bee6" Points="2,10 14,10 8,2"/>
                     </Canvas>
                 </ControlTemplate>
             </Setter.Value>
@@ -127,33 +127,33 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
                     <Canvas Height="10">
-                        <Polygon Fill="LightBlue" Points="2,0 8,8 14,0"/>
+                        <Polygon Fill="#91bee6" Points="2,0 8,8 14,0"/>
                     </Canvas>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style x:Key="ScrollBarPageButtonStyle" TargetType="{x:Type RepeatButton}">
+    <Style x:Key="ScrollBarPageButton" TargetType="{x:Type RepeatButton}">
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
-                    <Border BorderBrush="Transparent"/>
+                    <Border BorderBrush="Black"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style x:Key="ScrollBarThumbStyle" TargetType="{x:Type Thumb}">
+    <Style x:Key="ScrollBarThumb" TargetType="{x:Type Thumb}">
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Margin" Value="1,0,1,0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Rectangle Fill="LightBlue" Margin="2"/>
+                    <Rectangle Fill="#91bee6" Margin="2"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -169,31 +169,28 @@
 
             <RepeatButton Grid.Row="0" Height="10"
                           Style="{StaticResource ScrollBarLineTop}"
-                          Command="ScrollBar.LineUpCommand" >
-            </RepeatButton>
-            <Track Grid.Row="1" Name="PART_Track"
-                   IsDirectionReversed="True">
+                          Command="ScrollBar.LineUpCommand"/>
+            <Track Grid.Row="1" IsDirectionReversed="True">
                 <Track.DecreaseRepeatButton>
                     <RepeatButton Command="ScrollBar.PageUpCommand" 
-                                  Style="{StaticResource ScrollBarPageButtonStyle}"/>
+                                  Style="{StaticResource ScrollBarPageButton}"/>
                 </Track.DecreaseRepeatButton>
                 <Track.Thumb>
-                    <Thumb Style="{StaticResource ScrollBarThumbStyle}"/>
+                    <Thumb Style="{StaticResource ScrollBarThumb}"/>
                 </Track.Thumb>
                 <Track.IncreaseRepeatButton>
                     <RepeatButton Command="ScrollBar.PageDownCommand" 
-                                  Style="{StaticResource ScrollBarPageButtonStyle}"/>
+                                  Style="{StaticResource ScrollBarPageButton}"/>
                 </Track.IncreaseRepeatButton>
             </Track>
             <RepeatButton Grid.Row="2" Height="10"
                           Style="{StaticResource ScrollBarLineBottom}"
-                          Command="ScrollBar.LineDownCommand">
-            </RepeatButton>
+                          Command="ScrollBar.LineDownCommand"/>
         </Grid>
     </ControlTemplate>
 
 	<Style TargetType="{x:Type ScrollBar}">
 		<Setter Property="Template" Value="{StaticResource VerticalScrollBar}"/>
 	</Style>
-    
+	
 </ResourceDictionary>
