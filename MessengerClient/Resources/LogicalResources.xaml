@@ -16,7 +16,7 @@
         </Style.Triggers>
     </Style>
     
-    <Style x:Key="MyFocusVisual">
+    <Style x:Key="FocusVisual">
 		<Setter Property="Control.Template">
 		    <Setter.Value>
 			    <ControlTemplate TargetType="{x:Type Control}">
@@ -35,7 +35,7 @@
 	    <Setter Property="FontFamily" Value="David"/>
 	    <Setter Property="FontSize" Value="11px"/>
 	    <Setter Property="FontWeight" Value="Bold"/>
-	    <Setter Property="FocusVisualStyle" Value="{StaticResource MyFocusVisual}" />
+	    <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
 	    <Setter Property="Foreground" Value="#f2fbff"/>
 	    <Setter Property="Background" >
 	        <Setter.Value>
@@ -108,26 +108,26 @@
 	    </Setter>
 	</Style>
 	
-	<Style x:Key="ScrollBarLineButtonStyle" TargetType="{x:Type RepeatButton}">
+	<Style x:Key="ScrollBarLineTop" TargetType="{x:Type RepeatButton}">
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
-                    <Canvas Height="18">
-                        <Polygon Fill="LightBlue" Points="3,15 15,15 9,3"></Polygon>
+                    <Canvas Height="10">
+                        <Polygon Fill="LightBlue" Points="3,10 15,10 9,2"></Polygon>
                     </Canvas>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style x:Key="ScrollBarLineButtonBottomStyle" TargetType="{x:Type RepeatButton}">
+    <Style x:Key="ScrollBarLineBottom" TargetType="{x:Type RepeatButton}">
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
-                    <Canvas Height="18">
-                        <Polygon Fill="LightBlue" Points="3,3 9,15 15,3"></Polygon>
+                    <Canvas Height="10">
+                        <Polygon Fill="LightBlue" Points="3,-4 9,4 15,-4"></Polygon>
                     </Canvas>
                 </ControlTemplate>
             </Setter.Value>
@@ -162,13 +162,13 @@
     <ControlTemplate x:Key="VerticalScrollBar" TargetType="{x:Type ScrollBar}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition MaxHeight="18"/>
+                <RowDefinition MaxHeight="10"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition MaxHeight="18"/>
+                <RowDefinition MaxHeight="10"/>
             </Grid.RowDefinitions>
 
-            <RepeatButton Grid.Row="0" Height="18"
-                          Style="{StaticResource ScrollBarLineButtonStyle}"
+            <RepeatButton Grid.Row="0" Height="10"
+                          Style="{StaticResource ScrollBarLineTop}"
                           Command="ScrollBar.LineUpCommand" >
             </RepeatButton>
             <Track Name="PART_Track" Grid.Row="1" 
@@ -187,7 +187,7 @@
                 </Track.IncreaseRepeatButton>
             </Track>
             <RepeatButton Grid.Row="3" Height="18"
-                          Style="{StaticResource ScrollBarLineButtonBottomStyle}"
+                          Style="{StaticResource ScrollBarLineBottom}"
                           Command="ScrollBar.LineDownCommand">
             </RepeatButton>
         </Grid>
